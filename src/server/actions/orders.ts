@@ -5,11 +5,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendActualCostEmail, sendNewOrderEmail } from "@/lib/email";
+import { releaseStockForOrder, reserveStockForOrder } from "@/lib/inventory/order-hooks";
 import { triggerEvent } from "@/lib/pusher";
-import {
-  reserveStockForOrder,
-  releaseStockForOrder,
-} from "@/lib/inventory/order-hooks";
 import {
   type CreateOrderInput,
   createOrderSchema,
@@ -38,9 +35,10 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
   const session = await auth();
   if (session?.user?.role !== "SHOP_OWNER") return { success: false, error: "Forbidden" };
   if (!session.user.shopId) return { success: false, error: "No shop linked to your account" };
+  const shopId = session.user.shopId;
 
   const shop = await prisma.shop.findUnique({
-    where:  { id: session.user.shopId },
+    where: { id: shopId },
     select: { isActive: true },
   });
   if (!shop?.isActive) return { success: false, error: "Your shop is not yet approved" };
@@ -104,114 +102,125 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
     estimatedTotal += lineTotal;
   }
 
-  const { order, admins } = await prisma.$transaction(async (tx): Promise<{
-    order: { id: string; shop: { name: string }; items: { id: string }[] };
-    admins: { id: string; email: string | null }[];
-  }> => {
-    const order = await tx.order.create({
-      data: {
-        shopId: session.user.shopId!,
-        estimatedTotal,
-        notes: parsed.data.notes ?? null,
-        items: { create: itemsData },
-      },
-      include: {
-        shop:  { select: { name: true } },
-        items: { select: { id: true } },
-      },
-    });
-
-    const admins = await tx.user.findMany({
-      where:  { role: "COMPANY_ADMIN" },
-      select: { id: true, email: true },
-    });
-
-    if (admins.length) {
-      await tx.notification.createMany({
-        data: admins.map((a) => ({
-          userId:  a.id,
-          type:    "ORDER_PLACED" as const,
-          message: `New order from ${order.shop.name} — ${order.items.length} items, est. ${estimatedTotal.toLocaleString("ru-RU")} UZS`,
-        })),
-      });
-    }
-
-    // Stock shortage check (advisory — creates restock task but doesn't block order)
-    const productIds = itemsData.map((i) => i.productId);
-    const stockItems = await tx.stockItem.findMany({
-      where:  { productId: { in: productIds } },
-      select: { productId: true, availableKg: true, availablePieces: true },
-    });
-    const stockMap = new Map(stockItems.map((s) => [s.productId, s]));
-
-    type Shortage = { productId: string; orderedAs: "KG" | "PIECE"; shortBy: number };
-    const shortages: Shortage[] = [];
-
-    for (const item of itemsData) {
-      const stock = stockMap.get(item.productId);
-      if (!stock) continue;
-
-      if (item.orderedAs === "KG" && item.requestedKg != null) {
-        const available = Number(stock.availableKg ?? 0);
-        const shortBy   = item.requestedKg - available;
-        if (shortBy > 0) shortages.push({ productId: item.productId, orderedAs: "KG", shortBy });
-      } else if (item.orderedAs === "PIECE" && item.requestedPieces != null) {
-        const available = stock.availablePieces ?? 0;
-        const shortBy   = item.requestedPieces - available;
-        if (shortBy > 0) shortages.push({ productId: item.productId, orderedAs: "PIECE", shortBy });
-      }
-    }
-
-    if (shortages.length > 0) {
-      await tx.restockTask.create({
+  const { order, admins } = await prisma.$transaction(
+    async (
+      tx
+    ): Promise<{
+      order: { id: string; shop: { name: string }; items: { id: string }[] };
+      admins: { id: string; email: string | null }[];
+    }> => {
+      const order = await tx.order.create({
         data: {
-          status:         "PENDING",
-          priority:       "URGENT",
-          triggerType:    "ORDER_SHORTAGE",
-          triggerOrderId: order.id,
-          items: {
-            create: shortages.map((s) => ({
-              productId:    s.productId,
-              neededKg:     s.orderedAs === "KG"    ? s.shortBy            : undefined,
-              neededPieces: s.orderedAs === "PIECE" ? Math.ceil(s.shortBy) : undefined,
-            })),
-          },
+          shopId,
+          estimatedTotal,
+          notes: parsed.data.notes ?? null,
+          items: { create: itemsData },
+        },
+        include: {
+          shop: { select: { name: true } },
+          items: { select: { id: true } },
         },
       });
 
-      const shortId = order.id.slice(-6).toUpperCase();
+      const admins = await tx.user.findMany({
+        where: { role: "COMPANY_ADMIN" },
+        select: { id: true, email: true },
+      });
+
       if (admins.length) {
         await tx.notification.createMany({
           data: admins.map((a) => ({
-            userId:  a.id,
-            type:    "ORDER_SHORTAGE_ALERT" as const,
-            title:   "Order needs restock",
-            message: `Order #${shortId} has ${shortages.length} item${shortages.length !== 1 ? "s" : ""} below current stock. Urgent restock task created.`,
+            userId: a.id,
+            type: "ORDER_PLACED" as const,
+            message: `New order from ${order.shop.name} — ${order.items.length} items, est. ${estimatedTotal.toLocaleString("ru-RU")} UZS`,
           })),
         });
       }
-    }
 
-    return { order, admins };
-  });
+      // Stock shortage check (advisory — creates restock task but doesn't block order)
+      const stockProductIds = itemsData.map((i) => i.productId);
+      const stockItems = await tx.stockItem.findMany({
+        where: { productId: { in: stockProductIds } },
+        select: { productId: true, availableKg: true, availablePieces: true },
+      });
+      const stockMap = new Map(stockItems.map((s) => [s.productId, s]));
+
+      type Shortage = { productId: string; orderedAs: "KG" | "PIECE"; shortBy: number };
+      const shortages: Shortage[] = [];
+
+      for (const item of itemsData) {
+        const stock = stockMap.get(item.productId);
+        if (!stock) continue;
+
+        if (item.orderedAs === "KG" && item.requestedKg != null) {
+          const available = Number(stock.availableKg ?? 0);
+          const shortBy = item.requestedKg - available;
+          if (shortBy > 0) shortages.push({ productId: item.productId, orderedAs: "KG", shortBy });
+        } else if (item.orderedAs === "PIECE" && item.requestedPieces != null) {
+          const available = stock.availablePieces ?? 0;
+          const shortBy = item.requestedPieces - available;
+          if (shortBy > 0)
+            shortages.push({ productId: item.productId, orderedAs: "PIECE", shortBy });
+        }
+      }
+
+      if (shortages.length > 0) {
+        await tx.restockTask.create({
+          data: {
+            status: "PENDING",
+            priority: "URGENT",
+            triggerType: "ORDER_SHORTAGE",
+            triggerOrderId: order.id,
+            items: {
+              create: shortages.map((s) => ({
+                productId: s.productId,
+                neededKg: s.orderedAs === "KG" ? s.shortBy : undefined,
+                neededPieces: s.orderedAs === "PIECE" ? Math.ceil(s.shortBy) : undefined,
+              })),
+            },
+          },
+        });
+
+        const shortId = order.id.slice(-6).toUpperCase();
+        if (admins.length) {
+          await tx.notification.createMany({
+            data: admins.map((a) => ({
+              userId: a.id,
+              type: "ORDER_SHORTAGE_ALERT" as const,
+              title: "Order needs restock",
+              message: `Order #${shortId} has ${shortages.length} item${shortages.length !== 1 ? "s" : ""} below current stock. Urgent restock task created.`,
+            })),
+          });
+        }
+      }
+
+      return { order, admins };
+    }
+  );
 
   // Pusher and email — outside transaction (non-fatal)
   if (admins.length) {
-    await triggerEvent("private-admin", "new-order", {
-      orderId:        order.id,
-      shopName:       order.shop.name,
-      itemCount:      order.items.length,
-      estimatedTotal,
-    });
-
-    if (admins[0].email) {
-      await sendNewOrderEmail({
-        adminEmail:    admins[0].email,
-        shopName:      order.shop.name,
-        orderId:       order.id,
-        itemCount:     order.items.length,
+    try {
+      await triggerEvent("private-admin", "new-order", {
+        orderId: order.id,
+        shopName: order.shop.name,
+        itemCount: order.items.length,
         estimatedTotal,
       });
+      if (admins[0].email) {
+        await sendNewOrderEmail({
+          adminEmail: admins[0].email,
+          shopName: order.shop.name,
+          orderId: order.id,
+          itemCount: order.items.length,
+          estimatedTotal,
+        });
+      }
+    } catch (e) {
+      console.error(
+        "[placeOrder] Pusher/email notification failed:",
+        e instanceof Error ? e.message : e
+      );
     }
   }
 
@@ -231,14 +240,14 @@ export async function updateOrderStatus(
 
   // Fetch current status before the update so we know which hook to call
   const currentOrder = await prisma.order.findUniqueOrThrow({
-    where:  { id: parsed.data.orderId },
+    where: { id: parsed.data.orderId },
     select: { status: true },
   });
 
   const order = await prisma.$transaction(async (tx) => {
     const updated = await tx.order.update({
       where: { id: parsed.data.orderId },
-      data:  { status: parsed.data.status },
+      data: { status: parsed.data.status },
       include: { shop: { include: { user: true } } },
     });
 
@@ -295,13 +304,17 @@ export async function setActualCost(
   const { saveDraft = false } = parsed.data;
 
   const existingItems = await prisma.orderItem.findMany({
-    where: { id: { in: parsed.data.items.map((i) => i.orderItemId) }, orderId: parsed.data.orderId },
+    where: {
+      id: { in: parsed.data.items.map((i) => i.orderItemId) },
+      orderId: parsed.data.orderId,
+    },
   });
 
   let actualTotal = 0;
 
   await prisma.$transaction(async (tx) => {
-    for (const { orderItemId, actualKg, actualPieces, overridePrice, adminNote } of parsed.data.items) {
+    for (const { orderItemId, actualKg, actualPieces, overridePrice, adminNote } of parsed.data
+      .items) {
       const existing = existingItems.find((i) => i.id === orderItemId);
       if (!existing) continue;
 
@@ -416,7 +429,15 @@ export async function getOrderById(orderId: string) {
     where: { id: orderId },
     include: {
       shop: {
-        select: { id: true, name: true, ownerName: true, phone: true, address: true, latitude: true, longitude: true },
+        select: {
+          id: true,
+          name: true,
+          ownerName: true,
+          phone: true,
+          address: true,
+          latitude: true,
+          longitude: true,
+        },
       },
       items: {
         include: { product: { select: { id: true, name: true, unitType: true, imageUrl: true } } },
@@ -429,13 +450,13 @@ export async function getOrderById(orderId: string) {
               startedAt: true,
               staff: {
                 select: {
-                  fullName:     true,
-                  phone:        true,
-                  vehicleType:  true,
+                  fullName: true,
+                  phone: true,
+                  vehicleType: true,
                   vehiclePlate: true,
-                  currentLat:   true,
-                  currentLng:   true,
-                  lastSeenAt:   true,
+                  currentLat: true,
+                  currentLng: true,
+                  lastSeenAt: true,
                 },
               },
             },
@@ -450,19 +471,19 @@ export async function getOrderById(orderId: string) {
 
   return {
     ...row,
-    createdAt:      row.createdAt.toISOString(),
-    updatedAt:      row.updatedAt.toISOString(),
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
     estimatedTotal: Number(row.estimatedTotal),
-    actualTotal:    row.actualTotal    != null ? Number(row.actualTotal)    : null,
+    actualTotal: row.actualTotal != null ? Number(row.actualTotal) : null,
     deliveredTotal: row.deliveredTotal != null ? Number(row.deliveredTotal) : null,
-    deliveryNote:   row.deliveryNote,
+    deliveryNote: row.deliveryNote,
     shop: {
-      id:        row.shop.id,
-      name:      row.shop.name,
+      id: row.shop.id,
+      name: row.shop.name,
       ownerName: row.shop.ownerName,
-      phone:     row.shop.phone,
-      address:   row.shop.address,
-      latitude:  row.shop.latitude  != null ? Number(row.shop.latitude)  : null,
+      phone: row.shop.phone,
+      address: row.shop.address,
+      latitude: row.shop.latitude != null ? Number(row.shop.latitude) : null,
       longitude: row.shop.longitude != null ? Number(row.shop.longitude) : null,
     },
     routeStop: row.routeStop
@@ -474,13 +495,13 @@ export async function getOrderById(orderId: string) {
                 startedAt: row.routeStop.route.startedAt?.toISOString() ?? null,
                 staff: row.routeStop.route.staff
                   ? {
-                      fullName:     row.routeStop.route.staff.fullName,
-                      phone:        row.routeStop.route.staff.phone,
-                      vehicleType:  row.routeStop.route.staff.vehicleType as string,
+                      fullName: row.routeStop.route.staff.fullName,
+                      phone: row.routeStop.route.staff.phone,
+                      vehicleType: row.routeStop.route.staff.vehicleType as string,
                       vehiclePlate: row.routeStop.route.staff.vehiclePlate,
-                      currentLat:   row.routeStop.route.staff.currentLat,
-                      currentLng:   row.routeStop.route.staff.currentLng,
-                      lastSeenAt:   row.routeStop.route.staff.lastSeenAt?.toISOString() ?? null,
+                      currentLat: row.routeStop.route.staff.currentLat,
+                      currentLng: row.routeStop.route.staff.currentLng,
+                      lastSeenAt: row.routeStop.route.staff.lastSeenAt?.toISOString() ?? null,
                     }
                   : null,
               }
@@ -489,20 +510,20 @@ export async function getOrderById(orderId: string) {
       : null,
     items: row.items.map((i) => ({
       ...i,
-      orderedAs:       i.orderedAs as "KG" | "PIECE",
-      requestedKg:     i.requestedKg     != null ? Number(i.requestedKg)     : null,
+      orderedAs: i.orderedAs as "KG" | "PIECE",
+      requestedKg: i.requestedKg != null ? Number(i.requestedKg) : null,
       requestedPieces: i.requestedPieces ?? null,
-      actualKg:        i.actualKg        != null ? Number(i.actualKg)        : null,
-      actualPieces:    i.actualPieces    ?? null,
-      deliveredKg:     i.deliveredKg     != null ? Number(i.deliveredKg)     : null,
+      actualKg: i.actualKg != null ? Number(i.actualKg) : null,
+      actualPieces: i.actualPieces ?? null,
+      deliveredKg: i.deliveredKg != null ? Number(i.deliveredKg) : null,
       deliveredPieces: i.deliveredPieces ?? null,
-      returnedKg:      i.returnedKg      != null ? Number(i.returnedKg)      : null,
-      returnedPieces:  i.returnedPieces  ?? null,
-      returnReason:    i.returnReason    as string | null,
-      returnNote:      i.returnNote,
-      estimatedPrice:  Number(i.estimatedPrice),
-      actualPrice:     i.actualPrice  != null ? Number(i.actualPrice)  : null,
-      finalPrice:      i.finalPrice   != null ? Number(i.finalPrice)   : null,
+      returnedKg: i.returnedKg != null ? Number(i.returnedKg) : null,
+      returnedPieces: i.returnedPieces ?? null,
+      returnReason: i.returnReason as string | null,
+      returnNote: i.returnNote,
+      estimatedPrice: Number(i.estimatedPrice),
+      actualPrice: i.actualPrice != null ? Number(i.actualPrice) : null,
+      finalPrice: i.finalPrice != null ? Number(i.finalPrice) : null,
     })),
   };
 }
