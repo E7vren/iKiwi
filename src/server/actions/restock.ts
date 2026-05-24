@@ -1,12 +1,12 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { triggerEvent } from "@/lib/pusher";
 import { applyStockChange } from "@/lib/inventory/stock-engine";
+import { triggerEvent } from "@/lib/pusher";
 import {
   createManualRestockSchema,
   restockReceivedSchema,
@@ -41,8 +41,8 @@ export async function getMyWarehouseProfile() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const totalCompleted  = staff.assignedTasks.filter((t) => t.status === "COMPLETED").length;
-  const monthCompleted  = staff.assignedTasks.filter(
+  const totalCompleted = staff.assignedTasks.filter((t) => t.status === "COMPLETED").length;
+  const monthCompleted = staff.assignedTasks.filter(
     (t) => t.status === "COMPLETED" && t.completedAt && new Date(t.completedAt) >= startOfMonth
   ).length;
 
@@ -62,10 +62,10 @@ export async function getMyWarehouseProfile() {
       : null;
 
   return {
-    id:       staff.id,
+    id: staff.id,
     fullName: staff.fullName,
-    phone:    staff.phone,
-    email:    staff.user.email,
+    phone: staff.phone,
+    email: staff.user.email,
     stats: {
       totalCompleted,
       monthCompleted,
@@ -98,7 +98,7 @@ export async function getRestockTasks(status?: string) {
   return prisma.restockTask.findMany({
     where,
     include: {
-      items:      { include: { product: { include: { stockItem: true } } } },
+      items: { include: { product: { include: { stockItem: true } } } },
       assignedTo: true,
     },
     orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
@@ -108,7 +108,7 @@ export async function getRestockTasks(status?: string) {
 export async function getAllWarehouseStaff() {
   await requireAdmin();
   return prisma.warehouseStaff.findMany({
-    where:   { isActive: true },
+    where: { isActive: true },
     include: { user: { select: { email: true } } },
     orderBy: { fullName: "asc" },
   });
@@ -125,7 +125,7 @@ export async function createManualRestockTask(
 
     // Estimate cost from supplier prices
     const stockItems = await prisma.stockItem.findMany({
-      where:  { productId: { in: data.items.map((i) => i.productId) } },
+      where: { productId: { in: data.items.map((i) => i.productId) } },
       select: { productId: true, supplierPrice: true },
     });
     const priceMap = new Map(stockItems.map((s) => [s.productId, s.supplierPrice]));
@@ -133,23 +133,23 @@ export async function createManualRestockTask(
     let estimatedCost = 0;
     for (const item of data.items) {
       const price = Number(priceMap.get(item.productId) ?? 0);
-      if (item.neededKg)     estimatedCost += price * item.neededKg;
+      if (item.neededKg) estimatedCost += price * item.neededKg;
       if (item.neededPieces) estimatedCost += price * item.neededPieces;
     }
 
     const task = await prisma.restockTask.create({
       data: {
-        status:        data.assignedToId ? "ASSIGNED" : "PENDING",
-        priority:      data.priority,
-        triggerType:   "MANUAL",
-        assignedToId:  data.assignedToId ?? null,
-        assignedAt:    data.assignedToId ? new Date() : null,
-        adminNote:     data.adminNote,
+        status: data.assignedToId ? "ASSIGNED" : "PENDING",
+        priority: data.priority,
+        triggerType: "MANUAL",
+        assignedToId: data.assignedToId ?? null,
+        assignedAt: data.assignedToId ? new Date() : null,
+        adminNote: data.adminNote,
         estimatedCost: Math.round(estimatedCost) || null,
         items: {
           create: data.items.map((i) => ({
-            productId:    i.productId,
-            neededKg:     i.neededKg,
+            productId: i.productId,
+            neededKg: i.neededKg,
             neededPieces: i.neededPieces,
           })),
         },
@@ -158,16 +158,14 @@ export async function createManualRestockTask(
     });
 
     if (task.assignedToId && task.assignedTo) {
-      await triggerEvent(
-        `private-warehouse-${task.assignedToId}`,
-        "restock-assigned",
-        { taskId: task.id }
-      );
+      await triggerEvent(`private-warehouse-${task.assignedToId}`, "restock-assigned", {
+        taskId: task.id,
+      });
       await prisma.notification.create({
         data: {
-          userId:  task.assignedTo.user.id,
-          type:    "RESTOCK_ASSIGNED",
-          title:   "New restock task",
+          userId: task.assignedTo.user.id,
+          type: "RESTOCK_ASSIGNED",
+          title: "New restock task",
           message: `${data.items.length} item${data.items.length !== 1 ? "s" : ""} · est. ${Math.round(estimatedCost).toLocaleString()} UZS`,
         },
       });
@@ -177,7 +175,10 @@ export async function createManualRestockTask(
     revalidatePath("/warehouse");
     return { success: true, data: { id: task.id } };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to create restock task" };
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to create restock task",
+    };
   }
 }
 
@@ -196,25 +197,23 @@ export async function assignRestockTask(input: {
       where: { id: input.taskId },
       data: {
         assignedToId: input.staffId,
-        status:       "ASSIGNED",
-        assignedAt:   new Date(),
-        ...(input.priority  ? { priority:  input.priority  } : {}),
+        status: "ASSIGNED",
+        assignedAt: new Date(),
+        ...(input.priority ? { priority: input.priority } : {}),
         ...(input.adminNote ? { adminNote: input.adminNote } : {}),
       },
       include: { assignedTo: { include: { user: { select: { id: true } } } } },
     });
 
     if (task.assignedTo) {
-      await triggerEvent(
-        `private-warehouse-${input.staffId}`,
-        "restock-assigned",
-        { taskId: task.id }
-      );
+      await triggerEvent(`private-warehouse-${input.staffId}`, "restock-assigned", {
+        taskId: task.id,
+      });
       await prisma.notification.create({
         data: {
-          userId:  task.assignedTo.user.id,
-          type:    "RESTOCK_ASSIGNED",
-          title:   "Restock task assigned to you",
+          userId: task.assignedTo.user.id,
+          type: "RESTOCK_ASSIGNED",
+          title: "Restock task assigned to you",
           message: `Priority: ${task.priority}`,
         },
       });
@@ -234,13 +233,13 @@ export async function startRestockTask(taskId: string): Promise<ActionResult<voi
   try {
     const session = await requireWarehouseStaff();
     const staff = await prisma.warehouseStaff.findUnique({
-      where:  { userId: session.user.id },
+      where: { userId: session.user.id },
       select: { id: true },
     });
     if (!staff) return { success: false, error: "Staff profile not found" };
     await prisma.restockTask.update({
       where: { id: taskId, assignedToId: staff.id },
-      data:  { status: "IN_PROGRESS" },
+      data: { status: "IN_PROGRESS" },
     });
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
@@ -251,15 +250,13 @@ export async function startRestockTask(taskId: string): Promise<ActionResult<voi
 
 // ─── Staff: complete a restock (goods received, stock updated) ────────────────
 
-export async function completeRestockTask(
-  input: unknown
-): Promise<ActionResult<void>> {
+export async function completeRestockTask(input: unknown): Promise<ActionResult<void>> {
   try {
     const session = await requireWarehouseStaff();
     const data = restockReceivedSchema.parse(input);
 
     const staff = await prisma.warehouseStaff.findUnique({
-      where:  { userId: session.user.id },
+      where: { userId: session.user.id },
       select: { id: true, fullName: true },
     });
     if (!staff) return { success: false, error: "Staff profile missing" };
@@ -268,7 +265,7 @@ export async function completeRestockTask(
 
     await prisma.$transaction(async (tx) => {
       const task = await tx.restockTask.findUniqueOrThrow({
-        where:   { id: data.restockTaskId },
+        where: { id: data.restockTaskId },
         include: { items: true },
       });
 
@@ -281,25 +278,25 @@ export async function completeRestockTask(
         await tx.restockItem.update({
           where: { id: restockItem.id },
           data: {
-            receivedKg:        line.receivedKg,
-            receivedPieces:    line.receivedPieces,
-            pricePaidPerKg:    line.pricePaidPerKg,
+            receivedKg: line.receivedKg,
+            receivedPieces: line.receivedPieces,
+            pricePaidPerKg: line.pricePaidPerKg,
             pricePaidPerPiece: line.pricePaidPerPiece,
-            isReceived:        true,
+            isReceived: true,
           },
         });
 
         if ((line.receivedKg ?? 0) > 0 || (line.receivedPieces ?? 0) > 0) {
           await applyStockChange(tx, {
-            productId:        restockItem.productId,
-            deltaKg:          line.receivedKg,
-            deltaPieces:      line.receivedPieces,
-            type:             "RESTOCK",
-            performedBy:      session.user.id,
-            performedByRole:  "WAREHOUSE_STAFF",
+            productId: restockItem.productId,
+            deltaKg: line.receivedKg,
+            deltaPieces: line.receivedPieces,
+            type: "RESTOCK",
+            performedBy: session.user.id,
+            performedByRole: "WAREHOUSE_STAFF",
             warehouseStaffId: staff.id,
-            restockTaskId:    task.id,
-            note:             data.staffNote,
+            restockTaskId: task.id,
+            note: data.staffNote,
           });
           completedItemCount++;
         }
@@ -311,14 +308,14 @@ export async function completeRestockTask(
       });
 
       const admins = await tx.user.findMany({
-        where:  { role: "COMPANY_ADMIN" },
+        where: { role: "COMPANY_ADMIN" },
         select: { id: true },
       });
       await tx.notification.createMany({
         data: admins.map((a) => ({
-          userId:  a.id,
-          type:    "RESTOCK_COMPLETED" as const,
-          title:   "Restock completed",
+          userId: a.id,
+          type: "RESTOCK_COMPLETED" as const,
+          title: "Restock completed",
           message: `${staff.fullName} restocked ${completedItemCount} product${completedItemCount !== 1 ? "s" : ""}`,
         })),
       });
@@ -330,7 +327,30 @@ export async function completeRestockTask(
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to complete restock task" };
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to complete restock task",
+    };
+  }
+}
+
+// ─── Re-assign an existing ASSIGNED task to a different staff member ─────────
+
+export async function reassignRestockTask(input: {
+  taskId: string;
+  assignedToId: string | null;
+}): Promise<ActionResult<void>> {
+  try {
+    await requireAdmin();
+    await prisma.restockTask.update({
+      where: { id: input.taskId },
+      data: { assignedToId: input.assignedToId },
+    });
+    revalidatePath("/admin/restock");
+    revalidatePath("/warehouse");
+    return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to reassign task" };
   }
 }
 
@@ -338,8 +358,8 @@ export async function completeRestockTask(
 
 const createWarehouseStaffSchema = z.object({
   fullName: z.string().min(2).max(80),
-  email:    z.string().email(),
-  phone:    z.string().min(7).max(20),
+  email: z.string().email(),
+  phone: z.string().min(7).max(20),
   password: z.string().min(8).max(100),
 });
 
@@ -355,8 +375,8 @@ export async function createWarehouseStaff(input: unknown): Promise<ActionResult
         data: {
           email,
           password: passwordHash,
-          name:     fullName,
-          role:     "WAREHOUSE_STAFF",
+          name: fullName,
+          role: "WAREHOUSE_STAFF",
         },
       });
       return tx.warehouseStaff.create({
@@ -367,6 +387,9 @@ export async function createWarehouseStaff(input: unknown): Promise<ActionResult
     revalidatePath("/admin/staff");
     return { success: true, data: { id: staff.id } };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to create warehouse staff" };
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to create warehouse staff",
+    };
   }
 }
