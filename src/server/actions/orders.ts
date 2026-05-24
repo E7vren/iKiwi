@@ -18,8 +18,10 @@ import {
 
 type OrderRow = Prisma.OrderGetPayload<{
   include: {
-    shop: { select: { id: true; name: true; ownerName: true; phone: true } };
-    items: { include: { product: { select: { id: true; name: true; unitType: true } } } };
+    shop: { select: { id: true; name: true; ownerName: true; phone: true; address: true } };
+    items: {
+      include: { product: { select: { id: true; name: true; unitType: true; imageUrl: true } } };
+    };
   };
 }>;
 
@@ -548,9 +550,11 @@ export async function getMyOrders(page = 1, limit = 30) {
     prisma.order.findMany({
       where,
       include: {
-        shop: { select: { id: true, name: true, ownerName: true, phone: true } },
+        shop: { select: { id: true, name: true, ownerName: true, phone: true, address: true } },
         items: {
-          include: { product: { select: { id: true, name: true, unitType: true } } },
+          include: {
+            product: { select: { id: true, name: true, unitType: true, imageUrl: true } },
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -568,23 +572,43 @@ export async function getMyOrders(page = 1, limit = 30) {
 }
 
 export async function getAllOrders(
-  filters: { status?: string; shopId?: string; page?: number; limit?: number } = {}
+  filters: {
+    status?: string;
+    shopId?: string;
+    shopName?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    page?: number;
+    limit?: number;
+  } = {}
 ) {
   const session = await auth();
   if (session?.user?.role !== "COMPANY_ADMIN") return { orders: [], total: 0 };
 
-  const { status, shopId, page = 1, limit = 50 } = filters;
+  const { status, shopId, shopName, dateFrom, dateTo, page = 1, limit = 50 } = filters;
   const where: Prisma.OrderWhereInput = {};
   if (status && status !== "ALL") where.status = status as Prisma.EnumOrderStatusFilter;
   if (shopId) where.shopId = shopId;
+  if (shopName) where.shop = { name: { contains: shopName, mode: "insensitive" } };
+  if (dateFrom || dateTo) {
+    where.createdAt = {};
+    if (dateFrom) (where.createdAt as Prisma.DateTimeFilter).gte = new Date(dateFrom);
+    if (dateTo) {
+      const end = new Date(dateTo);
+      end.setUTCHours(23, 59, 59, 999);
+      (where.createdAt as Prisma.DateTimeFilter).lte = end;
+    }
+  }
 
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
       where,
       include: {
-        shop: { select: { id: true, name: true, ownerName: true, phone: true } },
+        shop: { select: { id: true, name: true, ownerName: true, phone: true, address: true } },
         items: {
-          include: { product: { select: { id: true, name: true, unitType: true } } },
+          include: {
+            product: { select: { id: true, name: true, unitType: true, imageUrl: true } },
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -642,10 +666,13 @@ export async function getTomorrowOrders() {
 function formatOrder(order: OrderRow) {
   return {
     ...order,
+    createdAt: order.createdAt.toISOString(),
+    updatedAt: order.updatedAt.toISOString(),
     estimatedTotal: Number(order.estimatedTotal),
     actualTotal: order.actualTotal != null ? Number(order.actualTotal) : null,
     items: order.items.map((i) => ({
       ...i,
+      orderedAs: i.orderedAs as "KG" | "PIECE",
       requestedKg: i.requestedKg != null ? Number(i.requestedKg) : null,
       requestedPieces: i.requestedPieces ?? null,
       actualKg: i.actualKg != null ? Number(i.actualKg) : null,
