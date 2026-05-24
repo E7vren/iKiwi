@@ -254,7 +254,7 @@ export async function skipStop(input: unknown): Promise<ActionResult<void>> {
       data: {
         status:      "SKIPPED",
         completedAt: new Date(),
-        driverNote:  reason ?? null,
+        driverNote:  reason,
       },
       select: { routeId: true, orderId: true, order: { select: { shopId: true } } },
     });

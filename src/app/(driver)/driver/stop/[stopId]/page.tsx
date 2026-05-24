@@ -329,14 +329,14 @@ function SkipSheet({
           <button
             onClick={onCancel}
             disabled={skipping}
-            className="flex-1 h-13 rounded-xl border-2 border-gray-200 font-semibold text-base"
+            className="flex-1 h-14 rounded-xl border-2 border-gray-200 font-semibold text-base"
           >
             Cancel
           </button>
           <button
             onClick={() => onConfirm(reason)}
             disabled={skipping || reason.trim().length < 5}
-            className="flex-1 h-13 rounded-xl bg-red-500 text-white font-bold text-base flex items-center justify-center gap-2 disabled:opacity-60"
+            className="flex-1 h-14 rounded-xl bg-red-500 text-white font-bold text-base flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {skipping ? <Loader2 className="h-5 w-5 animate-spin" /> : "Skip Stop"}
           </button>

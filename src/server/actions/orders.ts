@@ -79,7 +79,7 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
       if (!dp.pricePerKg)
         return { success: false, error: `No kg price today for "${product.name}"` };
       lineTotal = Math.round(Number(dp.pricePerKg) * item.requestedKg);
-      if (lineTotal === 0) {
+      if (lineTotal <= 0) {
         return {
           success: false,
           error: `Price for "${product.name}" is zero — cannot place order`,
@@ -96,7 +96,7 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
       if (!dp.pricePerPiece)
         return { success: false, error: `No piece price today for "${product.name}"` };
       lineTotal = Math.round(Number(dp.pricePerPiece) * item.requestedPieces);
-      if (lineTotal === 0) {
+      if (lineTotal <= 0) {
         return {
           success: false,
           error: `Price for "${product.name}" is zero — cannot place order`,
