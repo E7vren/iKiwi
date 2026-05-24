@@ -14,6 +14,7 @@ function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const entry = loginAttempts.get(ip);
   if (!entry || now > entry.resetAt) {
+    if (loginAttempts.size > 10_000) loginAttempts.clear(); // crude eviction to prevent OOM
     loginAttempts.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
     return false;
   }
@@ -30,7 +31,7 @@ export default auth((req) => {
     if (isRateLimited(ip)) {
       return new NextResponse("Too many login attempts. Try again in 15 minutes.", {
         status: 429,
-        headers: { "Retry-After": "900" },
+        headers: { "Retry-After": String(RATE_WINDOW_MS / 1000) },
       });
     }
   }
