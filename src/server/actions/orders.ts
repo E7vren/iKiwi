@@ -601,6 +601,44 @@ export async function getAllOrders(
   };
 }
 
+export async function getTomorrowOrders() {
+  const session = await auth();
+  if (
+    !session?.user ||
+    (session.user.role !== "COMPANY_ADMIN" && session.user.role !== "WAREHOUSE_STAFF")
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const today = todayUTC();
+  const tomorrow = new Date(today);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+
+  // B2B model: shops order the day before. "Tomorrow's orders" = placed today, delivered tomorrow.
+  const orders = await prisma.order.findMany({
+    where: {
+      status: { notIn: ["CANCELLED"] },
+      createdAt: { gte: today, lt: tomorrow },
+    },
+    include: {
+      shop: { select: { id: true, name: true, address: true } },
+      items: { include: { product: { select: { id: true, name: true, unitType: true } } } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return orders.map((o) => ({
+    ...o,
+    estimatedTotal: Number(o.estimatedTotal),
+    items: o.items.map((i) => ({
+      ...i,
+      requestedKg: i.requestedKg != null ? Number(i.requestedKg) : null,
+      requestedPieces: i.requestedPieces ?? null,
+      estimatedPrice: Number(i.estimatedPrice),
+    })),
+  }));
+}
+
 function formatOrder(order: OrderRow) {
   return {
     ...order,
