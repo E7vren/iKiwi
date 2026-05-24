@@ -79,6 +79,12 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
       if (!dp.pricePerKg)
         return { success: false, error: `No kg price today for "${product.name}"` };
       lineTotal = Math.round(Number(dp.pricePerKg) * item.requestedKg);
+      if (lineTotal === 0) {
+        return {
+          success: false,
+          error: `Price for "${product.name}" is zero — cannot place order`,
+        };
+      }
       itemsData.push({
         productId: item.productId,
         orderedAs: "KG",
@@ -90,6 +96,12 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
       if (!dp.pricePerPiece)
         return { success: false, error: `No piece price today for "${product.name}"` };
       lineTotal = Math.round(Number(dp.pricePerPiece) * item.requestedPieces);
+      if (lineTotal === 0) {
+        return {
+          success: false,
+          error: `Price for "${product.name}" is zero — cannot place order`,
+        };
+      }
       itemsData.push({
         productId: item.productId,
         orderedAs: "PIECE",
@@ -240,7 +252,7 @@ export async function updateOrderStatus(
 
   const order = await prisma.$transaction(async (tx) => {
     const currentOrder = await tx.order.findUniqueOrThrow({
-      where:  { id: parsed.data.orderId },
+      where: { id: parsed.data.orderId },
       select: { status: true },
     });
 
