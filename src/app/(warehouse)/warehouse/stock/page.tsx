@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 import { ClipboardCheck, PackagePlus, Search, ShoppingCart, X } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -325,6 +326,11 @@ function StockItem({
             {row.targetStockKg ? ` · Target: ${fmt(Number(row.targetStockKg))} kg` : ""}
           </p>
         )}
+        {row.lastRestockedAt && (
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Last in: {formatDistanceToNow(new Date(row.lastRestockedAt), { addSuffix: true })}
+          </p>
+        )}
       </div>
 
       <span
@@ -340,17 +346,19 @@ function StockItem({
           type="button"
           title="Set count"
           onClick={() => onCount(row)}
-          className="h-9 w-9 rounded-lg border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+          className="h-9 px-3 rounded-lg border flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary hover:border-primary transition-colors"
         >
           <ClipboardCheck className="h-4 w-4" />
+          Count
         </button>
         <button
           type="button"
           title="Log incoming"
           onClick={() => onIncoming(row)}
-          className="h-9 w-9 rounded-lg border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+          className="h-9 px-3 rounded-lg border flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary hover:border-primary transition-colors"
         >
           <PackagePlus className="h-4 w-4" />
+          Incoming
         </button>
       </div>
     </div>
