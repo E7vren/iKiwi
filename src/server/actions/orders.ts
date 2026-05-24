@@ -238,13 +238,12 @@ export async function updateOrderStatus(
   if (!parsed.success)
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation error" };
 
-  // Fetch current status before the update so we know which hook to call
-  const currentOrder = await prisma.order.findUniqueOrThrow({
-    where: { id: parsed.data.orderId },
-    select: { status: true },
-  });
-
   const order = await prisma.$transaction(async (tx) => {
+    const currentOrder = await tx.order.findUniqueOrThrow({
+      where:  { id: parsed.data.orderId },
+      select: { status: true },
+    });
+
     const updated = await tx.order.update({
       where: { id: parsed.data.orderId },
       data: { status: parsed.data.status },
