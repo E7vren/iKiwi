@@ -308,3 +308,27 @@ export async function getShoppingList(): Promise<ActionResult<ShoppingListTask |
     };
   }
 }
+
+// ─── Claim shopping list ──────────────────────────────────────────────────────
+
+export async function claimShoppingList(taskId: string): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "DELIVERY_STAFF") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    await prisma.restockTask.update({
+      where: { id: taskId },
+      data: {
+        adminNote: `[SHOPPING_LIST] Claimed by driver ${session.user.id} at ${new Date().toISOString()}`,
+      },
+    });
+
+    revalidatePath("/driver/shopping");
+    revalidatePath("/admin/restock");
+    return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to claim task" };
+  }
+}

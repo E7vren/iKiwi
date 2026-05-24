@@ -3,19 +3,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { CheckCircle2, ShoppingCart } from "lucide-react";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getShoppingList } from "@/server/actions/shopping";
-
-type ShoppingList = Awaited<ReturnType<typeof getShoppingList>>;
+import { claimShoppingList, getShoppingList } from "@/server/actions/shopping";
 
 function fmt(n: number) {
   return n.toLocaleString("en-US", { maximumFractionDigits: 1 });
 }
 
 export default function DriverShoppingPage() {
+  const [isPending, startTransition] = useTransition();
+
   const { data: result, isLoading } = useQuery({
-    queryKey:       ["driver-shopping-list"],
-    queryFn:        () => getShoppingList(),
+    queryKey: ["driver-shopping-list"],
+    queryFn: () => getShoppingList(),
     refetchInterval: 60_000,
   });
   const task = result?.success ? result.data : null;
@@ -23,7 +26,9 @@ export default function DriverShoppingPage() {
   if (isLoading) {
     return (
       <div className="p-4 space-y-3">
-        {[1, 2, 3].map((k) => <Skeleton key={k} className="h-20 rounded-xl" />)}
+        {[1, 2, 3].map((k) => (
+          <Skeleton key={k} className="h-20 rounded-xl" />
+        ))}
       </div>
     );
   }
@@ -56,23 +61,39 @@ export default function DriverShoppingPage() {
         </div>
       </div>
 
+      {/* Claim button */}
+      {task && (
+        <div className="px-4 pt-3">
+          <Button
+            className="w-full"
+            disabled={isPending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await claimShoppingList(task.id);
+                if (!result.success) toast.error(result.error);
+                else toast.success("Marked as 'on it' — team notified");
+              })
+            }
+          >
+            {isPending ? "Updating…" : "I'm on it"}
+          </Button>
+        </div>
+      )}
+
       {/* Items */}
       <div className="p-4 space-y-3">
         {task.items.map((item) => {
-          const isKg    = item.product.unitType === "KG"    || item.product.unitType === "BOTH";
-          const isPiece = item.product.unitType === "PIECE"  || item.product.unitType === "BOTH";
-          const availKg    = Number(item.product.stockItem?.availableKg    ?? 0);
+          const isKg = item.product.unitType === "KG" || item.product.unitType === "BOTH";
+          const isPiece = item.product.unitType === "PIECE" || item.product.unitType === "BOTH";
+          const availKg = Number(item.product.stockItem?.availableKg ?? 0);
           const availPieces = item.product.stockItem?.availablePieces ?? 0;
-          const neededKg    = Number(item.neededKg    ?? 0);
+          const neededKg = Number(item.neededKg ?? 0);
           const neededPieces = item.neededPieces ?? 0;
-          const toBuyKg    = Math.max(0, neededKg    - availKg);
+          const toBuyKg = Math.max(0, neededKg - availKg);
           const toBuyPieces = Math.max(0, neededPieces - availPieces);
 
           return (
-            <div
-              key={item.id}
-              className="rounded-xl border bg-white overflow-hidden shadow-sm"
-            >
+            <div key={item.id} className="rounded-xl border bg-white overflow-hidden shadow-sm">
               {/* Product name */}
               <div className="px-4 py-3 border-b bg-gray-50">
                 <p className="font-semibold">{item.product.name}</p>
@@ -83,9 +104,9 @@ export default function DriverShoppingPage() {
                 {/* To buy */}
                 <div className="px-4 py-3 text-center">
                   <p className="text-lg font-bold text-primary">
-                    {isKg    && toBuyKg    > 0 ? `${fmt(toBuyKg)} kg`     : ""}
-                    {isKg    && toBuyKg    > 0 && isPiece && toBuyPieces > 0 ? " / " : ""}
-                    {isPiece && toBuyPieces > 0 ? `${toBuyPieces} pcs`    : ""}
+                    {isKg && toBuyKg > 0 ? `${fmt(toBuyKg)} kg` : ""}
+                    {isKg && toBuyKg > 0 && isPiece && toBuyPieces > 0 ? " / " : ""}
+                    {isPiece && toBuyPieces > 0 ? `${toBuyPieces} pcs` : ""}
                     {toBuyKg === 0 && toBuyPieces === 0 ? "—" : ""}
                   </p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">TO BUY</p>
@@ -94,9 +115,9 @@ export default function DriverShoppingPage() {
                 {/* In stock */}
                 <div className="px-4 py-3 text-center">
                   <p className="text-base font-semibold text-gray-700">
-                    {isKg    ? `${fmt(availKg)} kg`    : ""}
-                    {isKg    && isPiece ? " / " : ""}
-                    {isPiece ? `${availPieces} pcs`    : ""}
+                    {isKg ? `${fmt(availKg)} kg` : ""}
+                    {isKg && isPiece ? " / " : ""}
+                    {isPiece ? `${availPieces} pcs` : ""}
                   </p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">IN STOCK</p>
                 </div>
@@ -104,9 +125,9 @@ export default function DriverShoppingPage() {
                 {/* Ordered */}
                 <div className="px-4 py-3 text-center">
                   <p className="text-base font-semibold text-gray-700">
-                    {isKg    && neededKg    > 0 ? `${fmt(neededKg)} kg`    : ""}
-                    {isKg    && neededKg    > 0 && isPiece && neededPieces > 0 ? " / " : ""}
-                    {isPiece && neededPieces > 0 ? `${neededPieces} pcs`   : ""}
+                    {isKg && neededKg > 0 ? `${fmt(neededKg)} kg` : ""}
+                    {isKg && neededKg > 0 && isPiece && neededPieces > 0 ? " / " : ""}
+                    {isPiece && neededPieces > 0 ? `${neededPieces} pcs` : ""}
                     {neededKg === 0 && neededPieces === 0 ? "—" : ""}
                   </p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">ORDERED</p>
