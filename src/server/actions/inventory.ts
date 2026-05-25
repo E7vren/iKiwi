@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { normalizeError } from "@/lib/errors";
 import { checkReorderPoint } from "@/lib/inventory/alerts";
 import { applyStockChange } from "@/lib/inventory/stock-engine";
 import { triggerEvent } from "@/lib/pusher";
@@ -107,7 +108,7 @@ export async function adjustStock(input: unknown): Promise<ActionResult<void>> {
     revalidatePath("/admin/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to adjust stock" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -158,10 +159,7 @@ export async function setReorderPoint(input: unknown): Promise<ActionResult<void
     revalidatePath("/admin/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to update reorder point",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -218,10 +216,7 @@ export async function warehouseUpdateStockCount(input: unknown): Promise<ActionR
     revalidatePath("/admin/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to update stock count",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -264,9 +259,6 @@ export async function warehouseLogIncoming(input: unknown): Promise<ActionResult
     revalidatePath("/admin/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to log incoming stock",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }

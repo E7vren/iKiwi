@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { normalizeError } from "@/lib/errors";
 import { triggerEvent } from "@/lib/pusher";
 import type { ActionResult } from "@/types";
 
@@ -237,10 +238,7 @@ export async function generateShoppingList(): Promise<
 
     return { success: true, data: { taskId, items: deficits } };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to generate shopping list",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -302,10 +300,7 @@ export async function getShoppingList(): Promise<ActionResult<ShoppingListTask |
 
     return { success: true, data: task };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to fetch shopping list",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -329,6 +324,6 @@ export async function claimShoppingList(taskId: string): Promise<ActionResult<vo
     revalidatePath("/admin/restock");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to claim task" };
+    return { success: false, error: normalizeError(e) };
   }
 }

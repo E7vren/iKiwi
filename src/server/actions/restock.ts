@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { normalizeError } from "@/lib/errors";
 import { applyStockChange } from "@/lib/inventory/stock-engine";
 import { triggerEvent } from "@/lib/pusher";
 import {
@@ -175,10 +176,7 @@ export async function createManualRestockTask(
     revalidatePath("/warehouse");
     return { success: true, data: { id: task.id } };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to create restock task",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -223,7 +221,7 @@ export async function assignRestockTask(input: {
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to assign task" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -244,7 +242,7 @@ export async function startRestockTask(taskId: string): Promise<ActionResult<voi
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to start task" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -327,10 +325,7 @@ export async function completeRestockTask(input: unknown): Promise<ActionResult<
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to complete restock task",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -350,7 +345,7 @@ export async function reassignRestockTask(input: {
     revalidatePath("/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to reassign task" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -387,9 +382,6 @@ export async function createWarehouseStaff(input: unknown): Promise<ActionResult
     revalidatePath("/admin/staff");
     return { success: true, data: { id: staff.id } };
   } catch (e) {
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Failed to create warehouse staff",
-    };
+    return { success: false, error: normalizeError(e) };
   }
 }

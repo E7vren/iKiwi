@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { triggerEvent } from "@/lib/pusher";
+import { normalizeError } from "@/lib/errors";
 import { consumeStockForOrder } from "@/lib/inventory/order-hooks";
+import { triggerEvent } from "@/lib/pusher";
 import {
   arriveAtStopSchema,
   completeDeliverySchema,
@@ -25,7 +26,7 @@ export async function arriveAtStop(input: unknown): Promise<ActionResult<void>> 
 
     const stop = await prisma.routeStop.update({
       where: { id: stopId, route: { staff: { userId: session.user.id } } },
-      data:  { status: "ARRIVED", arrivedAt: new Date() },
+      data: { status: "ARRIVED", arrivedAt: new Date() },
       include: {
         order: {
           include: {
@@ -44,8 +45,8 @@ export async function arriveAtStop(input: unknown): Promise<ActionResult<void>> 
     if (shopUserId) {
       await prisma.notification.create({
         data: {
-          userId:  shopUserId,
-          type:    "DRIVER_ARRIVED",
+          userId: shopUserId,
+          type: "DRIVER_ARRIVED",
           message: `${driverName} has arrived at your shop`,
         },
       });
@@ -57,7 +58,7 @@ export async function arriveAtStop(input: unknown): Promise<ActionResult<void>> 
 
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to update stop" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -102,8 +103,8 @@ export async function completeDelivery(
           ret.returnedKg != null
             ? unitPrice * ret.returnedKg
             : ret.returnedPieces != null
-            ? unitPrice * ret.returnedPieces
-            : 0;
+              ? unitPrice * ret.returnedPieces
+              : 0;
 
         totalReturned += refund;
 
@@ -116,12 +117,12 @@ export async function completeDelivery(
         await tx.orderItem.update({
           where: { id: item.id },
           data: {
-            deliveredKg:     deliveredKg != null ? deliveredKg : undefined,
+            deliveredKg: deliveredKg != null ? deliveredKg : undefined,
             deliveredPieces: deliveredPieces != null ? deliveredPieces : undefined,
-            returnedKg:      ret.returnedKg ?? null,
-            returnedPieces:  ret.returnedPieces ?? null,
-            returnReason:    ret.reason,
-            returnNote:      ret.note ?? null,
+            returnedKg: ret.returnedKg ?? null,
+            returnedPieces: ret.returnedPieces ?? null,
+            returnReason: ret.reason,
+            returnNote: ret.note ?? null,
             finalPrice,
           },
         });
@@ -133,9 +134,10 @@ export async function completeDelivery(
         await tx.orderItem.update({
           where: { id: item.id },
           data: {
-            deliveredKg:     item.actualKg,
+            deliveredKg: item.actualKg,
             deliveredPieces: item.actualPieces,
-            finalPrice:      item.actualPrice != null ? Number(item.actualPrice) : Number(item.estimatedPrice),
+            finalPrice:
+              item.actualPrice != null ? Number(item.actualPrice) : Number(item.estimatedPrice),
           },
         });
       }
@@ -159,9 +161,9 @@ export async function completeDelivery(
       await tx.routeStop.update({
         where: { id: data.stopId },
         data: {
-          status:      stopStatus,
+          status: stopStatus,
           completedAt: new Date(),
-          driverNote:  data.deliveryNote ?? null,
+          driverNote: data.deliveryNote ?? null,
         },
       });
 
@@ -172,7 +174,7 @@ export async function completeDelivery(
       const pendingCount = await tx.routeStop.count({
         where: {
           routeId: stop.routeId,
-          status:  { in: ["PENDING", "ARRIVED", "VERIFYING"] },
+          status: { in: ["PENDING", "ARRIVED", "VERIFYING"] },
         },
       });
       if (pendingCount === 0) {
@@ -188,7 +190,7 @@ export async function completeDelivery(
       const returnedNames = data.returns
         .map((r) => {
           const item = order.items.find((i) => i.id === r.orderItemId);
-          return item ? item.product?.name ?? null : null;
+          return item ? (item.product?.name ?? null) : null;
         })
         .filter((n): n is string => n !== null)
         .slice(0, 3)
@@ -203,8 +205,8 @@ export async function completeDelivery(
       if (order.shop.user?.id) {
         await tx.notification.create({
           data: {
-            userId:  order.shop.user.id,
-            type:    notificationType,
+            userId: order.shop.user.id,
+            type: notificationType,
             message: notificationMsg,
           },
         });
@@ -216,15 +218,15 @@ export async function completeDelivery(
     // Pusher events — non-fatal
     try {
       await triggerEvent(`private-shop-${result.order.shopId}`, "delivery-completed", {
-        orderId:        result.order.id,
+        orderId: result.order.id,
         deliveredTotal: result.deliveredTotal,
-        totalReturned:  result.totalReturned,
-        hasReturns:     result.hasReturns,
+        totalReturned: result.totalReturned,
+        hasReturns: result.hasReturns,
       });
       await triggerEvent("private-admin", "delivery-completed", {
-        orderId:        result.order.id,
-        shopName:       result.order.shop.name,
-        hasReturns:     result.hasReturns,
+        orderId: result.order.id,
+        shopName: result.order.shop.name,
+        hasReturns: result.hasReturns,
         returnedAmount: result.totalReturned,
       });
     } catch (e) {
@@ -240,7 +242,7 @@ export async function completeDelivery(
       data: { deliveredTotal: result.deliveredTotal, totalReturned: result.totalReturned },
     };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to complete delivery" };
+    return { success: false, error: normalizeError(e) };
   }
 }
 
@@ -252,9 +254,9 @@ export async function skipStop(input: unknown): Promise<ActionResult<void>> {
     const stop = await prisma.routeStop.update({
       where: { id: stopId, route: { staff: { userId: session.user.id } } },
       data: {
-        status:      "SKIPPED",
+        status: "SKIPPED",
         completedAt: new Date(),
-        driverNote:  reason,
+        driverNote: reason,
       },
       select: { routeId: true, orderId: true, order: { select: { shopId: true } } },
     });
@@ -268,7 +270,7 @@ export async function skipStop(input: unknown): Promise<ActionResult<void>> {
     const pendingCount = await prisma.routeStop.count({
       where: {
         routeId: stop.routeId,
-        status:  { in: ["PENDING", "ARRIVED", "VERIFYING"] },
+        status: { in: ["PENDING", "ARRIVED", "VERIFYING"] },
       },
     });
     if (pendingCount === 0) {
@@ -281,6 +283,6 @@ export async function skipStop(input: unknown): Promise<ActionResult<void>> {
     revalidatePath("/driver");
     return { success: true, data: undefined };
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "Failed to skip stop" };
+    return { success: false, error: normalizeError(e) };
   }
 }
