@@ -337,6 +337,14 @@ export async function setActualCost(
       if (overridePrice != null) {
         lineTotal = overridePrice;
         adminAdjusted = true;
+        console.info("[AUDIT] Price override", {
+          orderId:     parsed.data.orderId,
+          orderItemId,
+          overridePrice,
+          adminId:     session.user.id,
+          adminNote,
+          timestamp:   new Date().toISOString(),
+        });
       } else if (actualKg != null && existing.requestedKg != null) {
         const pricePerKg = Number(existing.estimatedPrice) / Number(existing.requestedKg);
         lineTotal = Math.round(actualKg * pricePerKg);
