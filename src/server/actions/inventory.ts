@@ -259,6 +259,10 @@ export async function warehouseLogIncoming(input: unknown): Promise<ActionResult
     revalidatePath("/admin/warehouse");
     return { success: true, data: undefined };
   } catch (e) {
+    console.error("[warehouseLogIncoming] failed", {
+      productId: (input as { productId?: string })?.productId,
+      error:     e instanceof Error ? e.message : String(e),
+    });
     return { success: false, error: normalizeError(e) };
   }
 }

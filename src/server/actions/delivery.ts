@@ -242,6 +242,10 @@ export async function completeDelivery(
       data: { deliveredTotal: result.deliveredTotal, totalReturned: result.totalReturned },
     };
   } catch (e) {
+    console.error("[completeDelivery] failed", {
+      stopId: (input as { stopId?: string })?.stopId,
+      error:  e instanceof Error ? e.message : String(e),
+    });
     return { success: false, error: normalizeError(e) };
   }
 }
