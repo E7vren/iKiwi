@@ -58,47 +58,34 @@ function StatCard({
   sub,
   icon: Icon,
   trend,
-  color,
 }: {
   title: string;
   value: string | number;
   sub?: string;
   icon: React.ElementType;
   trend?: number;
-  color: string;
+  color?: string; // kept in type for backward compat with callers, ignored
 }) {
-  const colors: Record<string, string> = {
-    green: "bg-green-50 text-green-600",
-    blue: "bg-blue-50 text-blue-600",
-    orange: "bg-orange-50 text-orange-600",
-    purple: "bg-purple-50 text-purple-600",
-    red: "bg-red-50 text-red-600",
-  };
+  const trendUp   = trend !== undefined && trend >= 0;
+  const trendDown = trend !== undefined && trend < 0;
 
   return (
-    <Card className="border-0 shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${colors[color]}`}>
-          <Icon className="h-4 w-4" />
+    <Card className="border-0">
+      <CardContent className="flex items-start gap-4 pt-4">
+        {/* Charcoal icon square — Design.md: "prominent icon in a charcoal-tinted square" */}
+        <div className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/8 text-foreground">
+          <Icon className="h-6 w-6" />
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <div className="flex items-center gap-1.5 mt-1">
-          {trend !== undefined && trend !== 0 && (
-            <span
-              className={`flex items-center gap-0.5 text-xs font-medium ${trend > 0 ? "text-green-600" : "text-red-500"}`}
-            >
-              {trend > 0 ? (
-                <TrendingUp className="h-3 w-3" />
-              ) : (
-                <TrendingDown className="h-3 w-3" />
-              )}
-              {Math.abs(trend)}
-            </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-label-md text-muted-foreground uppercase tracking-wider mb-1">{title}</p>
+          <p className="text-data-display leading-none">{value}</p>
+          {sub && (
+            <p className="text-label-md text-muted-foreground mt-1 flex items-center gap-1">
+              {trendUp   && <TrendingUp   className="h-3.5 w-3.5 text-primary shrink-0" />}
+              {trendDown && <TrendingDown className="h-3.5 w-3.5 text-destructive shrink-0" />}
+              {sub}
+            </p>
           )}
-          {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
         </div>
       </CardContent>
     </Card>
