@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Logo } from "@/components/shared/Logo";
 import { NotifBell } from "@/components/shared/NotifBell";
 import { ThemeToggleIcon } from "@/components/shared/ThemeToggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -81,10 +80,15 @@ export function WarehouseShell({
   return (
     <div className="flex flex-col min-h-dvh bg-background">
       {/* ─── Top bar ─────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Logo size={28} />
-          <span className="text-xs font-semibold text-muted-foreground -ml-1">Warehouse</span>
+      <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0 shadow-[0px_1px_4px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <span className="text-primary-foreground font-extrabold text-sm tracking-tight">iK</span>
+          </div>
+          <div>
+            <p className="font-extrabold text-sm leading-none text-foreground">iKiWi</p>
+            <p className="text-[11px] text-muted-foreground">Warehouse</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-1">

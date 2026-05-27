@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Logo } from "@/components/shared/Logo";
 import { ThemeToggleIcon } from "@/components/shared/ThemeToggle";
 import { cn } from "@/lib/utils";
 
@@ -38,8 +37,13 @@ export function TopBar({ userName }: Props) {
       )}
     >
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
-        <Link href="/shop" aria-label="Go to catalog">
-          <Logo size={32} />
+        <Link href="/shop" aria-label="Go to catalog" className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <span className="text-primary-foreground font-extrabold text-xs tracking-tight">iK</span>
+          </div>
+          <span className="font-extrabold text-base leading-none tracking-tight text-foreground">
+            i<span className="text-primary">K</span>i<span className="text-primary">W</span>i
+          </span>
         </Link>
         <div className="flex items-center gap-1">
           <ThemeToggleIcon />

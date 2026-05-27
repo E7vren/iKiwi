@@ -4,11 +4,13 @@ import {
   Archive,
   ClipboardList,
   History,
+  HelpCircle,
   LayoutDashboard,
   LayoutList,
   LogOut,
   MapPin,
   PackageSearch,
+  Plus,
   Settings,
   ShoppingCart,
   Store,
@@ -16,10 +18,11 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { Logo } from "@/components/shared/Logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -59,15 +62,14 @@ function NavLink({ href, label, icon: Icon, exact }: (typeof links)[0]) {
       className={cn(
         "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-label-lg transition-colors",
         active
-          ? "bg-muted text-foreground"
+          ? "bg-primary/12 text-primary font-semibold"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
       )}
     >
-      {/* Vertical lime accent bar for active item */}
       {active && (
         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary" />
       )}
-      <Icon className="h-5 w-5 shrink-0" />
+      <Icon className={cn("h-5 w-5 shrink-0", active ? "text-primary" : "")} />
       {label}
     </Link>
   );
@@ -75,15 +77,36 @@ function NavLink({ href, label, icon: Icon, exact }: (typeof links)[0]) {
 
 export function Sidebar() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <aside className="hidden md:flex flex-col w-[260px] shrink-0 border-r border-border bg-card h-screen sticky top-0">
-      <div className="px-5 py-4 border-b border-border">
-        <Logo size={32} />
-        <p className="text-label-md text-muted-foreground mt-0.5 ml-0.5">Admin Panel</p>
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <span className="text-primary-foreground font-extrabold text-sm tracking-tight">iK</span>
+          </div>
+          <div>
+            <p className="font-extrabold text-base leading-none tracking-tight text-foreground">iKiWi</p>
+            <p className="text-label-md text-muted-foreground mt-0.5">Admin Console</p>
+          </div>
+        </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+      {/* New Order CTA */}
+      <div className="px-3 pt-4 pb-2">
+        <Button
+          className="w-full gap-2 font-semibold"
+          onClick={() => router.push("/admin/orders")}
+        >
+          <Plus className="h-4 w-4" />
+          New Order
+        </Button>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
         {links.map((link) => (
           <NavLink key={link.href} {...link} />
         ))}
@@ -97,11 +120,12 @@ export function Sidebar() {
         </div>
       </nav>
 
-      <div className="px-3 pb-4 border-t border-border pt-3 space-y-3">
+      {/* Bottom: user + support + sign out */}
+      <div className="px-3 pb-4 border-t border-border pt-3 space-y-1">
         {session?.user && (
-          <div className="flex items-center gap-2.5 px-1">
+          <div className="flex items-center gap-2.5 px-2 py-2 mb-1">
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarFallback className="bg-primary/15 text-xs font-bold" style={{ color: "#3b5900" }}>
+              <AvatarFallback className="bg-primary/15 text-xs font-bold text-primary-foreground" style={{ color: "#3b5900" }}>
                 {getInitials(session.user.name)}
               </AvatarFallback>
             </Avatar>
@@ -111,13 +135,20 @@ export function Sidebar() {
             </div>
           </div>
         )}
+        <Link
+          href="/admin/settings"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-label-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+        >
+          <HelpCircle className="h-5 w-5 shrink-0" />
+          Support
+        </Link>
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-label-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-label-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
         >
           <LogOut className="h-5 w-5 shrink-0" />
-          Sign out
+          Logout
         </button>
       </div>
     </aside>

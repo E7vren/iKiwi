@@ -117,7 +117,7 @@ export function DriverShell({
     <DriverCtx.Provider value={{ isOnline, setOnline, clearShopBadge: () => setShopBadge(0) }}>
       <div className="flex flex-col min-h-dvh bg-background">
         {/* ─── Top bar ─────────────────────────────────── */}
-        <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0">
+        <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0 shadow-[0px_1px_4px_rgba(0,0,0,0.04)]">
           <div className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0">
               <span className="text-primary-foreground font-bold text-base">iK</span>
