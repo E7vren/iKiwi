@@ -48,7 +48,7 @@ export default function DriverShoppingPage() {
   return (
     <div className="space-y-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-10 bg-card border-b px-4 py-3 shadow-sm">
         <div className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5 text-primary" />
           <div>
@@ -93,9 +93,9 @@ export default function DriverShoppingPage() {
           const toBuyPieces = Math.max(0, neededPieces - availPieces);
 
           return (
-            <div key={item.id} className="rounded-xl border bg-white overflow-hidden shadow-sm">
+            <div key={item.id} className="rounded-xl border bg-card overflow-hidden shadow-sm">
               {/* Product name */}
-              <div className="px-4 py-3 border-b bg-gray-50">
+              <div className="px-4 py-3 border-b bg-muted/50">
                 <p className="font-semibold">{item.product.name}</p>
               </div>
 

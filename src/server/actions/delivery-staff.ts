@@ -217,6 +217,38 @@ export async function getStaffDetails(staffId: string) {
   };
 }
 
+export async function getMyDriverProfile() {
+  const session = await requireDeliveryStaff();
+
+  const staff = await prisma.deliveryStaff.findUniqueOrThrow({
+    where: { userId: session.user.id },
+    include: {
+      user: { select: { email: true } },
+      routes: {
+        select: { id: true, status: true, date: true },
+      },
+    },
+  });
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const completedRoutes = staff.routes.filter((r) => r.status === "COMPLETED");
+  const thisMonthRoutes = completedRoutes.filter((r) => new Date(r.date) >= startOfMonth);
+
+  return {
+    fullName: staff.fullName,
+    phone: staff.phone,
+    vehicleType: staff.vehicleType as string,
+    vehiclePlate: staff.vehiclePlate,
+    email: staff.user.email,
+    stats: {
+      routesThisMonth: thisMonthRoutes.length,
+      totalRoutes: completedRoutes.length,
+    },
+  };
+}
+
 export async function adminResetPassword(input: {
   staffId: string;
   newPassword: string;

@@ -1,0 +1,937 @@
+{
+  "categories": [
+    {
+      "key": "SITRUS MEVALAR",
+      "name_uz": "SITRUS MEVALAR",
+      "name_en": "Citrus Fruits",
+      "name_ru": "Цитрусовые",
+      "icon": "🍊"
+    },
+    {
+      "key": "MEVALAR",
+      "name_uz": "MEVALAR",
+      "name_en": "Fruits",
+      "name_ru": "Фрукты",
+      "icon": "🍎"
+    },
+    {
+      "key": "SABZAVOTLAR",
+      "name_uz": "SABZAVOTLAR",
+      "name_en": "Vegetables",
+      "name_ru": "Овощи",
+      "icon": "🥦"
+    },
+    {
+      "key": "KO'KATLAR",
+      "name_uz": "KO'KATLAR",
+      "name_en": "Greens & Dairy",
+      "name_ru": "Зелень",
+      "icon": "🌿"
+    },
+    {
+      "key": "Don mahsulotlari",
+      "name_uz": "Don mahsulotlari",
+      "name_en": "Grains & Nuts",
+      "name_ru": "Крупы и орехи",
+      "icon": "🌾"
+    }
+  ],
+  "products": [
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Kartoshka yangi",
+      "unitType": "KG",
+      "price": 7500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Kartoshka qizil yangi",
+      "unitType": "KG",
+      "price": 7500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Kartoshka Gala Pokiston",
+      "unitType": "KG",
+      "price": 7500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Kartoshka Qizil Pokiston",
+      "unitType": "KG",
+      "price": 7500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Piyoz yangi",
+      "unitType": "KG",
+      "price": 2200
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Eski Piyoz",
+      "unitType": "KG",
+      "price": 1500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Loy Sabzi Sariq",
+      "unitType": "KG",
+      "price": 4000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Loy Sabzi Qizil",
+      "unitType": "KG",
+      "price": 4500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Sabzi Sariq Yuvilgan",
+      "unitType": "KG",
+      "price": 5500
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Sabzi Qizil Yuvilgan",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Saabzi qizil yangi yuvilgan",
+      "unitType": "KG",
+      "price": 7000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Sabzi Bog'li",
+      "unitType": "PIECE",
+      "price": 8000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Pamidor Roziviy Pek 5 qator",
+      "unitType": "KG",
+      "price": 14000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Pamidor Roziviy Pek 6 qator",
+      "unitType": "KG",
+      "price": 14000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Pamidor Qizil Teplitsa",
+      "unitType": "KG",
+      "price": 11000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Pamidor Qizil Turkman shoda",
+      "unitType": "KG",
+      "price": 11000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Bodring Orzu",
+      "unitType": "KG",
+      "price": 12000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Bodring gladkiy",
+      "unitType": "KG",
+      "price": 7000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Bodring gladkiy",
+      "unitType": "KG",
+      "price": 7000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Chesnok uzb (yaxshi)",
+      "unitType": "KG",
+      "price": 15000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Sholg'om Qizil",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Shalg'om bog'li",
+      "unitType": "PIECE",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Sholg'om Sariq",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Lavlagi Bog'li",
+      "unitType": "PIECE",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Lavlagi Yangi",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Balgarski jipsi (yaxshi)",
+      "unitType": "KG",
+      "price": 15000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Balgar Svetafor",
+      "unitType": "KG",
+      "price": 28000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Balgarskiy Ferrari",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Balgarskiy Qizil",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Balgarskiy Vidrana",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Qo'qon Qalampir",
+      "unitType": "KG",
+      "price": 80000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Baqlajon",
+      "unitType": "KG",
+      "price": 15000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Gul Karam 1-sort",
+      "unitType": "KG",
+      "price": 8000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Karam Yangi",
+      "unitType": "KG",
+      "price": 2000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Qovoq",
+      "unitType": "KG",
+      "price": 10000
+    },
+    {
+      "category": "SABZAVOTLAR",
+      "category_en": "Vegetables",
+      "name_uz": "Turp",
+      "unitType": "KG",
+      "price": 4000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Ukrob",
+      "unitType": "PIECE",
+      "price": 10000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Kashnich",
+      "unitType": "PIECE",
+      "price": 10000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Petrushka",
+      "unitType": "PIECE",
+      "price": 10000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Seldir",
+      "unitType": "PIECE",
+      "price": 10000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Salat Bargi",
+      "unitType": "PIECE",
+      "price": 4000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Ko'k Piyoz",
+      "unitType": "PIECE",
+      "price": 10000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Ko'k Chesnok",
+      "unitType": "PIECE",
+      "price": 15000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Rediska",
+      "unitType": "PIECE",
+      "price": 4000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Tok Bargi  bog'li",
+      "unitType": "PIECE",
+      "price": 5000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Qopchalik Markovcha Salatlar",
+      "unitType": "PIECE",
+      "price": 3500
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Qopchalik Salatlar kattasi",
+      "unitType": "PIECE",
+      "price": 7000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Salatlar Idishli",
+      "unitType": "PIECE",
+      "price": 7000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Paketlar",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "XONADON TUXUM",
+      "unitType": "PIECE",
+      "price": 2000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Ko'ksi  (0.5)",
+      "unitType": "PIECE",
+      "price": 25000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Ko'ksi (1.5)",
+      "unitType": "PIECE",
+      "price": 30000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Go'ja 1 litr",
+      "unitType": "PIECE",
+      "price": 12000
+    },
+    {
+      "category": "KO'KATLAR",
+      "category_en": "Greens & Dairy",
+      "name_uz": "Go'ja 0.5",
+      "unitType": "PIECE",
+      "price": 6000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Ko'k sulton",
+      "unitType": "KG",
+      "price": 75000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Gilos",
+      "unitType": "KG",
+      "price": 35000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "O'rik yangi hosil",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Kripson baxmal O'rta",
+      "unitType": "KG",
+      "price": 23000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Golden baxmal  O'rta",
+      "unitType": "KG",
+      "price": 23000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Golden SUPER",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Kripson SUPER",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Semerenka",
+      "unitType": "KG",
+      "price": 18000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Kripson ERON",
+      "unitType": "KG",
+      "price": 20000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Golden ERON",
+      "unitType": "KG",
+      "price": 20000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Pinklede",
+      "unitType": "KG",
+      "price": 22500
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Pinklede Ozarbayjon",
+      "unitType": "KG",
+      "price": 27000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Golden Polsha",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Kripson Polsha",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Saltanat (11kg)",
+      "unitType": "PIECE",
+      "price": 240000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Saltanat",
+      "unitType": "KG",
+      "price": 24000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Granny Smith",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Nok Olma (xitoy)",
+      "unitType": "KG",
+      "price": 17000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Nok Xitoy (15 kg)",
+      "unitType": "PIECE",
+      "price": 250000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Nok lesnoy (10kg)",
+      "unitType": "PIECE",
+      "price": 150000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Oq Aport Xitoy",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Olma Qizil Aport Xitoy",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Golubika",
+      "unitType": "PIECE",
+      "price": 35000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Avacado",
+      "unitType": "PIECE",
+      "price": 20000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Qovun",
+      "unitType": "KG",
+      "price": 15000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Tarvuz",
+      "unitType": "KG",
+      "price": 10000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Qulupnay",
+      "unitType": "KG",
+      "price": 50000
+    },
+    {
+      "category": "MEVALAR",
+      "category_en": "Fruits",
+      "name_uz": "Dovcha",
+      "unitType": "KG",
+      "price": 30000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Apelsin Misr Afrika",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Apelsin ERON",
+      "unitType": "KG",
+      "price": 12000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Ananas  Xitoy",
+      "unitType": "PIECE",
+      "price": 80000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Limon UZB",
+      "unitType": "KG",
+      "price": 55000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Limon Turkiya",
+      "unitType": "KG",
+      "price": 50000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Limon Xitoy",
+      "unitType": "KG",
+      "price": 40000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Mandarin Turkiya",
+      "unitType": "KG",
+      "price": 20000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Mandarin Kapalak (9kg)",
+      "unitType": "PIECE",
+      "price": 220000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Mandarin Kapalak (10kg)",
+      "unitType": "PIECE",
+      "price": 260000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Mandarin Kapalak (11,5kg)",
+      "unitType": "PIECE",
+      "price": 300000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Mandarin ERON (11,5 kg)",
+      "unitType": "PIECE",
+      "price": 180000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Kivi 12 talik",
+      "unitType": "KG",
+      "price": 38000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Kivi yashikli",
+      "unitType": "KG",
+      "price": 28000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Banan Bananza karobka",
+      "unitType": "PIECE",
+      "price": 480000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Banan ECUALITTA   (22,5kg)",
+      "unitType": "PIECE",
+      "price": 450000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Banan Bananjon korobka",
+      "unitType": "PIECE",
+      "price": 450000
+    },
+    {
+      "category": "SITRUS MEVALAR",
+      "category_en": "Citrus Fruits",
+      "name_uz": "Banan  kiloga",
+      "unitType": "KG",
+      "price": 21500
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Mosh",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Noxat Eron",
+      "unitType": "KG",
+      "price": 22000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Garox",
+      "unitType": "KG",
+      "price": 9000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Grechka",
+      "unitType": "KG",
+      "price": 10000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch Lazer Xorazm",
+      "unitType": "KG",
+      "price": 14000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch Lazer drablyonka",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch Alanga",
+      "unitType": "KG",
+      "price": 13000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch Alanga drablyonka",
+      "unitType": "KG",
+      "price": 6000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch Avangard",
+      "unitType": "KG",
+      "price": 9000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Gerkules",
+      "unitType": "KG",
+      "price": 9500
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Guruch |Sechka toza",
+      "unitType": "KG",
+      "price": 5000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Fasol",
+      "unitType": "KG",
+      "price": 16000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Loviya",
+      "unitType": "KG",
+      "price": 17000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Perlovka",
+      "unitType": "KG",
+      "price": 7500
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Simichka tuzli",
+      "unitType": "KG",
+      "price": 38000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Simichka tuzsiz",
+      "unitType": "KG",
+      "price": 38000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Pista",
+      "unitType": "KG",
+      "price": 160000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Yeryong'oq",
+      "unitType": "KG",
+      "price": 22000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Yeryong'oq chaqiljan",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Oq Yeryong'oq",
+      "unitType": "KG",
+      "price": 25000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Yong'oq chaqiljan",
+      "unitType": "KG",
+      "price": 90000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Bodom",
+      "unitType": "KG",
+      "price": 130000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Bodom chaqiljan",
+      "unitType": "KG",
+      "price": 130000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Sho'rdanak",
+      "unitType": "KG",
+      "price": 35000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Parvarda",
+      "unitType": "KG",
+      "price": 20000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Turshak",
+      "unitType": "KG",
+      "price": 45000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Turshak oddiy",
+      "unitType": "KG",
+      "price": 20000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Magiz",
+      "unitType": "KG",
+      "price": 60000
+    },
+    {
+      "category": "Don mahsulotlari",
+      "category_en": "Grains & Nuts",
+      "name_uz": "Hindiston Yong'oq (keshyu)",
+      "unitType": "KG",
+      "price": 160000
+    }
+  ]
+}

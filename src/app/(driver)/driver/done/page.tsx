@@ -67,7 +67,7 @@ function SummaryContent() {
       {loading ? (
         <Loader2 className="h-8 w-8 text-primary animate-spin" />
       ) : route ? (
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border divide-y text-left">
+        <div className="w-full max-w-sm bg-card rounded-2xl shadow-sm border divide-y text-left">
           <StatRow label="Deliveries" value={`${deliveredCount} stops`} />
           <StatRow
             label="Partial returns"
@@ -114,7 +114,7 @@ function SummaryContent() {
             return (
               <div
                 key={stop.id}
-                className="flex justify-between items-center text-sm border rounded-lg px-3 py-2 bg-white"
+                className="flex justify-between items-center text-sm border rounded-lg px-3 py-2 bg-card"
               >
                 <span className="font-medium truncate mr-3">{shopName}</span>
                 <span

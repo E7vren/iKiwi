@@ -91,6 +91,7 @@ const itemSchema = z.object({
 
 const actualCostSchema = z.object({
   finalCostNote: z.string().max(500),
+  deliveryFee: z.number().min(0),
   items: z.array(itemSchema).superRefine((items, ctx) => {
     items.forEach((item, idx) => {
       if (item.overrideEnabled && !item.overrideReason.trim()) {
@@ -121,11 +122,13 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<ActualCostForm>({
+  } = useForm<ActualCostForm, unknown, ActualCostForm>({
     resolver: zodResolver(actualCostSchema),
     values: order
       ? {
           finalCostNote: order.finalCostNote ?? "",
+          deliveryFee: order.deliveryFee ??
+            Math.round(order.estimatedTotal * (order.estimatedTotal >= 1_000_000 ? 0.05 : 0.10)),
           items: order.items.map((item) => {
             const requestedQty =
               item.orderedAs === "KG" ? (item.requestedKg ?? 1) : (item.requestedPieces ?? 1);
@@ -147,11 +150,12 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
             };
           }),
         }
-      : { finalCostNote: "", items: [] },
+      : { finalCostNote: "", deliveryFee: 0, items: [] },
   });
 
   const { fields } = useFieldArray({ control, name: "items" });
   const watched = watch("items");
+  const watchedFee = watch("deliveryFee");
 
   // ── computed totals ──────────────────────────────────────────────────────
   function autoCalc(i: ActualCostForm["items"][number]): number {
@@ -170,9 +174,13 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
     if (!i.overrideEnabled) return s;
     return s + ((i.overridePrice || 0) - autoCalc(i));
   }, 0);
-  const finalTotal = calculatedTotal + adjustments;
+  const subtotal = calculatedTotal + adjustments;
+  const fee = watchedFee || 0;
+  const finalTotal = subtotal + fee;
   const estimatedTotal = order?.estimatedTotal ?? 0;
-  const finalDiff = finalTotal - estimatedTotal;
+  const estimatedFee = order?.deliveryFee ??
+    Math.round(estimatedTotal * (estimatedTotal >= 1_000_000 ? 0.05 : 0.10));
+  const finalDiff = finalTotal - (estimatedTotal + estimatedFee);
 
   // ── submit ───────────────────────────────────────────────────────────────
   async function onSubmit(data: ActualCostForm) {
@@ -183,6 +191,7 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
     const result = await setActualCost({
       orderId: order.id,
       saveDraft: draft,
+      deliveryFee: data.deliveryFee,
       finalCostNote: data.finalCostNote || undefined,
       items: data.items.map((i) => ({
         orderItemId: i.orderItemId,
@@ -383,12 +392,8 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
             {/* Summary block */}
             <div className="rounded-xl border bg-gray-50 p-4 space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
-                <span>Estimated Total</span>
-                <span>{formatPrice(estimatedTotal)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Calculated Total</span>
-                <span>{formatPrice(calculatedTotal)}</span>
+                <span>Subtotal</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               {adjustments !== 0 && (
                 <div
@@ -401,9 +406,27 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
                   </span>
                 </div>
               )}
+              <div className="flex justify-between items-center text-muted-foreground">
+                <span>
+                  Delivery Fee
+                  <span className="ml-1 text-[10px] text-muted-foreground">
+                    ({fee >= (estimatedTotal * 0.07) ? "5%" : "10%"})
+                  </span>
+                </span>
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    step="1000"
+                    min="0"
+                    {...register("deliveryFee", { valueAsNumber: true })}
+                    className="h-7 w-32 text-right text-sm"
+                  />
+                  <span className="text-xs shrink-0">UZS</span>
+                </div>
+              </div>
               <Separator />
               <div className="flex justify-between items-baseline">
-                <span className="font-bold text-base">Final Total</span>
+                <span className="font-bold text-base">Grand Total</span>
                 <span className="font-bold text-xl text-primary">{formatPrice(finalTotal)}</span>
               </div>
               {finalDiff !== 0 && (
@@ -531,11 +554,11 @@ function OrderRowExpanded({ order, onFinalize }: { order: Order; onFinalize: () 
       <TableCell className="hidden sm:table-cell text-sm">{order.items.length}</TableCell>
       <TableCell>
         <p className="text-sm font-bold">
-          {formatPrice(order.actualTotal ?? order.estimatedTotal)}
+          {formatPrice((order.actualTotal ?? order.estimatedTotal) + (order.deliveryFee ?? 0))}
         </p>
-        {order.actualTotal != null && (
-          <p className="text-xs text-muted-foreground line-through">
-            {formatPrice(order.estimatedTotal)}
+        {order.deliveryFee != null && order.deliveryFee > 0 && (
+          <p className="text-[10px] text-muted-foreground">
+            +{formatPrice(order.deliveryFee)} delivery
           </p>
         )}
       </TableCell>

@@ -84,8 +84,8 @@ function ReturnSheet({
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
 
       {/* Sheet */}
-      <div className="relative bg-white rounded-t-2xl max-h-[90dvh] overflow-y-auto">
-        <div className="sticky top-0 bg-white px-4 pt-5 pb-3 border-b z-10">
+      <div className="relative bg-card rounded-t-2xl max-h-[90dvh] overflow-y-auto">
+        <div className="sticky top-0 bg-card px-4 pt-5 pb-3 border-b z-10">
           <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
           <h2 className="text-lg font-bold">
             Return from{" "}
@@ -254,7 +254,7 @@ function ItemCard({
       className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-gray-50 transition-colors"
     >
       {/* Image / emoji */}
-      <div className="h-14 w-14 rounded-xl bg-gray-100 shrink-0 overflow-hidden flex items-center justify-center">
+      <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
         {item.product.imageUrl ? (
           <img
             src={item.product.imageUrl}
@@ -308,7 +308,7 @@ function SkipSheet({
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
-      <div className="relative bg-white rounded-t-2xl p-5 space-y-4">
+      <div className="relative bg-card rounded-t-2xl p-5 space-y-4">
         <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto" />
         <h2 className="text-lg font-bold text-center">Skip this stop?</h2>
         <p className="text-sm text-muted-foreground text-center">
@@ -471,7 +471,7 @@ export default function StopPage({ params }: { params: Promise<{ stopId: string 
   return (
     <div className="flex flex-col min-h-dvh">
       {/* ─── Header ────────────────────────────────── */}
-      <div className="bg-white border-b px-4 pt-3 pb-4 space-y-2">
+      <div className="bg-card border-b px-4 pt-3 pb-4 space-y-2">
         <div className="flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -502,7 +502,7 @@ export default function StopPage({ params }: { params: Promise<{ stopId: string 
           <p className="text-sm text-muted-foreground">Tap an item to mark a return</p>
         </div>
 
-        <div className="bg-white border-y divide-y">
+        <div className="bg-card border-y divide-y">
           {items.map((item) => (
             <ItemCard
               key={item.id}
@@ -515,7 +515,7 @@ export default function StopPage({ params }: { params: Promise<{ stopId: string 
       </div>
 
       {/* ─── Sticky bottom summary ────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-[0_-4px_16px_rgba(0,0,0,0.1)] p-4 space-y-3 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-[0_-4px_16px_rgba(0,0,0,0.1)] p-4 space-y-3 pb-safe">
         <div className="space-y-1.5 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>Original total</span>

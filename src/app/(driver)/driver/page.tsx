@@ -66,7 +66,7 @@ function RouteReadyState({
   return (
     <div className="p-4 space-y-4">
       {/* Summary card */}
-      <div className="bg-white rounded-2xl shadow-sm border p-5 space-y-4">
+      <div className="bg-card rounded-2xl shadow-sm border p-5 space-y-4">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center">
             <Package className="h-6 w-6 text-primary" />
@@ -91,10 +91,10 @@ function RouteReadyState({
       </div>
 
       {/* Stop preview list */}
-      <div className="bg-white rounded-2xl shadow-sm border divide-y">
+      <div className="bg-card rounded-2xl shadow-sm border divide-y">
         {route.stops.map((stop, i) => (
           <div key={stop.id} className="flex items-center px-4 py-3.5 gap-3">
-            <span className="h-7 w-7 rounded-full bg-gray-100 text-gray-500 text-sm font-bold flex items-center justify-center shrink-0">
+            <span className="h-7 w-7 rounded-full bg-muted text-muted-foreground text-sm font-bold flex items-center justify-center shrink-0">
               {i + 1}
             </span>
             <p className="flex-1 font-medium text-sm truncate">{stop.order.shop.name}</p>
@@ -167,7 +167,7 @@ function RouteInProgressState({
       </div>
 
       {/* Current stop card */}
-      <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+      <div className="bg-card rounded-2xl shadow-sm border overflow-hidden">
         <div className="bg-primary/5 border-b px-4 py-2.5 flex items-center gap-2">
           <MapPin className="h-4 w-4 text-primary" />
           <span className="text-sm font-semibold text-primary">Current Stop</span>
@@ -224,13 +224,13 @@ function RouteInProgressState({
 
       {/* Remaining stops */}
       {remainingStops.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border divide-y">
+        <div className="bg-card rounded-2xl shadow-sm border divide-y">
           <p className="px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             Next stops
           </p>
           {remainingStops.map((stop) => (
             <div key={stop.id} className="flex items-center px-4 py-3.5 gap-3">
-              <span className="h-7 w-7 rounded-full bg-gray-100 text-gray-500 text-sm font-bold flex items-center justify-center shrink-0">
+              <span className="h-7 w-7 rounded-full bg-muted text-muted-foreground text-sm font-bold flex items-center justify-center shrink-0">
                 {stop.sequence}
               </span>
               <p className="flex-1 font-medium text-sm truncate">{stop.order.shop.name}</p>

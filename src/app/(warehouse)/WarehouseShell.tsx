@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { Logo } from "@/components/shared/Logo";
 import { NotifBell } from "@/components/shared/NotifBell";
+import { ThemeToggleIcon } from "@/components/shared/ThemeToggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -81,7 +82,8 @@ export function WarehouseShell({
           <span className="text-xs font-semibold text-muted-foreground -ml-1">Warehouse</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <ThemeToggleIcon />
           <NotifBell />
 
           <DropdownMenu>

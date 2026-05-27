@@ -1,0 +1,19 @@
+{
+  "name": "iKiwi",
+  "short_name": "iKiwi",
+  "description": "B2B produce delivery platform for Tashkent shops",
+  "start_url": "/shop",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
