@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -12,8 +13,6 @@ import {
   Clock,
   Store,
   TrendingUp,
-  Download,
-  Calendar,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -62,6 +61,8 @@ async function fetchDashboard() {
     totalProducts: number;
     pendingOrdersList: DashboardOrder[];
     recentOrders: DashboardOrder[];
+    weekRevenue: { day: string; revenue: number }[];
+    monthRevenue: { day: string; revenue: number }[];
   }>;
 }
 
@@ -72,15 +73,6 @@ function getGreeting() {
   return "Good Evening";
 }
 
-// Sparkline-style chart data — last 7 days shape based on real revenue
-function buildChartData(revenue: number) {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const weights = [0.6, 0.75, 0.8, 0.9, 1.0, 0.95, 0.85];
-  return days.map((day, i) => ({
-    day,
-    revenue: Math.round(revenue * weights[i] * (0.85 + Math.random() * 0.3)),
-  }));
-}
 
 function TrendBadge({ value }: { value: number }) {
   if (value === 0) return (
@@ -148,6 +140,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const { data: session } = useSession();
   const qc = useQueryClient();
+  const [chartPeriod, setChartPeriod] = useState<"week" | "month">("week");
 
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
@@ -187,7 +180,7 @@ export default function AdminDashboard() {
   const orderTrend = data.yesterdayOrders > 0
     ? Math.round(((data.todayOrders - data.yesterdayOrders) / data.yesterdayOrders) * 100)
     : 0;
-  const chartData = buildChartData(data.revenue);
+  const chartData = chartPeriod === "week" ? data.weekRevenue : data.monthRevenue;
   const adminName = session?.user?.name?.split(" ")[0] ?? "Admin";
 
   return (
@@ -199,14 +192,6 @@ export default function AdminDashboard() {
           <p className="text-body-md text-muted-foreground mt-0.5">
             Here is what&apos;s happening with your operations today.
           </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex">
-            <Calendar className="h-4 w-4" /> Today
-          </Button>
-          <Button size="sm" className="gap-1.5">
-            <Download className="h-4 w-4" /> Export
-          </Button>
         </div>
       </div>
 
@@ -276,8 +261,16 @@ export default function AdminDashboard() {
                 <p className="text-body-md text-muted-foreground mt-0.5">Daily performance across all shops</p>
               </div>
               <div className="flex rounded-lg border border-border overflow-hidden text-label-md">
-                <button type="button" className="px-3 py-1.5 bg-muted text-foreground font-semibold">Week</button>
-                <button type="button" className="px-3 py-1.5 text-muted-foreground hover:bg-muted/50 transition-colors">Month</button>
+                <button
+                  type="button"
+                  onClick={() => setChartPeriod("week")}
+                  className={`px-3 py-1.5 transition-colors ${chartPeriod === "week" ? "bg-muted text-foreground font-semibold" : "text-muted-foreground hover:bg-muted/50"}`}
+                >Week</button>
+                <button
+                  type="button"
+                  onClick={() => setChartPeriod("month")}
+                  className={`px-3 py-1.5 transition-colors ${chartPeriod === "month" ? "bg-muted text-foreground font-semibold" : "text-muted-foreground hover:bg-muted/50"}`}
+                >Month</button>
               </div>
             </div>
             <div className="px-2 pt-4 pb-2 h-64">

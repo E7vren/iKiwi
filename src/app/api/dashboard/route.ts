@@ -18,6 +18,23 @@ export async function GET() {
   const yesterday = dayUTC(-1);
   const tomorrow = dayUTC(1);
 
+  // Build per-day revenue for last 30 days
+  async function getDailyRevenue(daysBack: number) {
+    const results: { day: string; revenue: number }[] = [];
+    for (let i = daysBack - 1; i >= 0; i--) {
+      const from = dayUTC(-i);
+      const to   = dayUTC(-i + 1);
+      const agg  = await prisma.order.aggregate({
+        where: { status: { in: ["DELIVERED", "READY"] }, createdAt: { gte: from, lt: to } },
+        _sum: { actualTotal: true, estimatedTotal: true },
+      });
+      const dayRevenue = Number(agg._sum.actualTotal ?? agg._sum.estimatedTotal ?? 0);
+      const label = from.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+      results.push({ day: label, revenue: dayRevenue });
+    }
+    return results;
+  }
+
   const [
     totalShops,
     activeShops,
@@ -94,6 +111,11 @@ export async function GET() {
   const marginPct = revenue > 0 ? (profit / revenue) * 100 : null;
   const cogsKnown = deliveredItems.some((i) => i.product.stockItem?.supplierPrice != null);
 
+  const [weekRevenue, monthRevenue] = await Promise.all([
+    getDailyRevenue(7),
+    getDailyRevenue(30),
+  ]);
+
   return NextResponse.json({
     totalShops,
     activeShops,
@@ -108,6 +130,8 @@ export async function GET() {
     cogsKnown,
     pricesSetToday: pricesSetToday > 0,
     totalProducts,
+    weekRevenue,
+    monthRevenue,
     recentOrders: recentOrders.map((o) => ({
       id: o.id,
       shopName: o.shop.name,

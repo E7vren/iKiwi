@@ -14,6 +14,7 @@ import {
   Save,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -621,8 +622,9 @@ function OrderRowExpanded({ order, onFinalize }: { order: Order; onFinalize: () 
 // ─── Main OrderTable ──────────────────────────────────────────────────────────
 
 export function OrderTable() {
+  const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [shopSearch, setShopSearch] = useState("");
+  const [shopSearch, setShopSearch] = useState(() => searchParams.get("search") ?? "");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [finalizing, setFinalizing] = useState<Order | null>(null);
