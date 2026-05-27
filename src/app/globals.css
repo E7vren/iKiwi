@@ -24,7 +24,7 @@
   --color-danger:            #c62828;
 
   /* Typography */
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
 
   /* Radius */
