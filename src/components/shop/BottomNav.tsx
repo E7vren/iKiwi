@@ -5,19 +5,16 @@ import { Bell, ClipboardList, Home, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/translations";
 import { useLocaleStore } from "@/store/localeStore";
 import { useCartStore } from "@/store/cartStore";
-import { getPusherClient } from "@/lib/pusherClient";
 import { formatPrice } from "@/lib/utils";
 
 export function BottomNav() {
   const pathname = usePathname();
   const locale = useLocaleStore((s) => s.locale);
   const T = useTranslations(locale);
-  const { data: session } = useSession();
 
   const cartItems = useCartStore((s) => s.items);
   const cartCount = cartItems.reduce((acc, i) => acc + i.qty, 0);
@@ -34,22 +31,12 @@ export function BottomNav() {
     } catch {}
   }
 
-  // Poll every 30s + real-time Pusher
+  // Poll every 30s for unread notifications
   useEffect(() => {
     fetchUnread();
     const id = setInterval(fetchUnread, 30_000);
     return () => clearInterval(id);
   }, []);
-
-  useEffect(() => {
-    if (!session?.user) return;
-    const pusher = getPusherClient();
-    if (!pusher) return;
-    const shopId = (session.user as { shopId?: string }).shopId;
-    const channel = pusher.subscribe(`private-shop-${shopId}`);
-    channel.bind("new-notification", fetchUnread);
-    return () => { channel.unbind_all(); pusher.unsubscribe(`private-shop-${shopId}`); };
-  }, [session?.user]);
 
   const links = [
     { href: "/shop",                 label: T.catalog, icon: Home,          badge: 0 },

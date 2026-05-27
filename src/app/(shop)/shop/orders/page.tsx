@@ -10,14 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice, getStatusColor, getStatusLabel } from "@/lib/utils";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 import type { Order, OrderItem } from "@/types";
-
-const STATUS_TABS: { value: string; label: string }[] = [
-  { value: "ALL", label: "All" },
-  { value: "PENDING", label: "Pending" },
-  { value: "ACTIVE", label: "Active" },
-  { value: "DELIVERED", label: "Done" },
-];
 
 async function fetchOrders(): Promise<{ orders: Order[] }> {
   const res = await fetch("/api/orders?limit=50");
@@ -174,7 +169,16 @@ function OrderCard({ order }: { order: Order }) {
 }
 
 export default function ShopOrdersPage() {
+  const locale = useLocaleStore((s) => s.locale);
+  const T = useTranslations(locale);
   const [tab, setTab] = useState("ALL");
+
+  const STATUS_TABS = [
+    { value: "ALL",       label: T.tabAll },
+    { value: "PENDING",   label: T.tabPending },
+    { value: "ACTIVE",    label: T.tabActive },
+    { value: "DELIVERED", label: T.tabDone },
+  ];
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["orders", "shop"],
@@ -187,7 +191,7 @@ export default function ShopOrdersPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-bold">My Orders</h1>
+      <h1 className="text-lg font-bold">{T.myOrders}</h1>
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="w-full grid grid-cols-4">
@@ -220,26 +224,22 @@ export default function ShopOrdersPage() {
               <ShoppingBag className="h-12 w-12 text-primary/50" />
             </div>
             <div className="space-y-1.5">
-              <p className="font-semibold text-[16px] text-foreground">
-                Your first order is just a tap away!
-              </p>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Browse fresh produce from iKiwi and place your first order — delivered tomorrow morning.
-              </p>
+              <p className="font-semibold text-[16px] text-foreground">{T.firstOrderTitle}</p>
+              <p className="text-sm text-muted-foreground max-w-xs">{T.firstOrderDesc}</p>
             </div>
             <Link
               href="/shop"
               className="inline-flex items-center justify-center rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-[15px] font-medium px-6 h-11 mt-1"
             >
               <ShoppingBag className="h-4 w-4 mr-2" />
-              Start Shopping
+              {T.startShopping}
             </Link>
           </div>
         ) : (
           <div className="py-20 text-center space-y-3 text-muted-foreground">
             <PackageSearch className="h-12 w-12 mx-auto opacity-30" />
-            <p className="font-medium text-foreground">No {tab.toLowerCase()} orders</p>
-            <p className="text-sm">Try a different filter.</p>
+            <p className="font-medium text-foreground">{T.noFilteredOrders}</p>
+            <p className="text-sm">{T.tryDifferentFilter}</p>
           </div>
         )
       ) : (

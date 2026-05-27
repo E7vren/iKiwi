@@ -21,6 +21,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { AppFooter } from "@/components/shared/AppFooter";
 import { cn } from "@/lib/utils";
 import { useLocaleStore, type Locale } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 import {
   useSettingsStore,
   type ImageQuality,
@@ -188,6 +189,7 @@ export default function SettingsPage() {
 
   const locale    = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
+  const T = useTranslations(locale);
 
   const textSize     = useSettingsStore((s) => s.textSize);
   const setTextSize  = useSettingsStore((s) => s.setTextSize);
@@ -203,13 +205,13 @@ export default function SettingsPage() {
   const [deleteOpen,  setDeleteOpen]  = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
 
-  const sizeLabel:    Record<TextSize, string>     = { small: "Small", medium: "Medium", large: "Large" };
-  const qualityLabel: Record<ImageQuality, string> = { high: "High", medium: "Medium", low: "Low" };
+  const sizeLabel:    Record<TextSize, string>     = { small: T.sizeSmall, medium: T.sizeMedium, large: T.sizeLarge };
+  const qualityLabel: Record<ImageQuality, string> = { high: T.qualityHigh, medium: T.qualityMedium, low: T.qualityLow };
   const localeLabel:  Record<Locale, string>       = { uz: "O'zbekcha", en: "English", ru: "Русский" };
 
   function handleClearCache() {
     setCacheOpen(false);
-    toast.success("Cache cleared");
+    toast.success(T.clearCacheSuccess);
   }
 
   function handleDeleteAccount() {
@@ -230,124 +232,123 @@ export default function SettingsPage() {
         >
           <ArrowLeft className="h-5 w-5 text-foreground" />
         </Link>
-        <h1 className="text-[18px] font-bold text-foreground">Settings</h1>
+        <h1 className="text-[18px] font-bold text-foreground">{T.settings}</h1>
       </div>
 
       {/* 1 ── Account */}
-      <GroupHeader label="Account" />
+      <GroupHeader label={T.account} />
       <Group>
-        <SettingRow icon={<Key className="h-5 w-5" />}   label="Change Password" href="/shop/profile" />
-        <SettingRow icon={<Mail className="h-5 w-5" />}  label="Change Email"    href="/shop/profile" />
-        <SettingRow icon={<Phone className="h-5 w-5" />} label="Change Phone"    href="/shop/profile" />
+        <SettingRow icon={<Key className="h-5 w-5" />}   label={T.changePassword} href="/shop/profile" />
+        <SettingRow icon={<Mail className="h-5 w-5" />}  label={T.changeEmail}    href="/shop/profile" />
+        <SettingRow icon={<Phone className="h-5 w-5" />} label={T.changePhone}    href="/shop/profile" />
       </Group>
 
       {/* 2 ── Notifications */}
-      <GroupHeader label="Notifications" />
+      <GroupHeader label={T.notifications} />
       <Group>
         <SettingRow
           icon={<Bell className="h-5 w-5" />}
-          label="Push Notifications"
+          label={T.pushNotifications}
           right={<Toggle checked={notifications.push} onChange={(v) => setNotif("push", v)} />}
           noChevron
         />
         <SettingRow
           icon={<Mail className="h-5 w-5" />}
-          label="Email Alerts"
+          label={T.emailAlerts}
           right={<Toggle checked={notifications.email} onChange={(v) => setNotif("email", v)} />}
           noChevron
         />
         <SettingRow
           icon={<Phone className="h-5 w-5" />}
-          label="SMS Alerts"
+          label={T.smsAlerts}
           right={<Toggle checked={notifications.sms} onChange={(v) => setNotif("sms", v)} />}
           noChevron
         />
         <SettingRow
-          label="Order Updates"
-          subtitle="Delivery status changes"
+          label={T.orderUpdates}
+          subtitle={T.orderUpdatesDesc}
           right={<Toggle checked={notifications.orderUpdates} onChange={(v) => setNotif("orderUpdates", v)} />}
           noChevron
         />
         <SettingRow
-          label="Price Changes"
-          subtitle="When product prices are updated"
+          label={T.priceChanges}
+          subtitle={T.priceChangesDesc}
           right={<Toggle checked={notifications.priceChanges} onChange={(v) => setNotif("priceChanges", v)} />}
           noChevron
         />
         <SettingRow
-          label="Promotions"
-          subtitle="Deals and special offers"
+          label={T.promotions}
+          subtitle={T.promotionsDesc}
           right={<Toggle checked={notifications.promotions} onChange={(v) => setNotif("promotions", v)} />}
           noChevron
         />
       </Group>
 
       {/* 3 ── Appearance */}
-      <GroupHeader label="Appearance" />
+      <GroupHeader label={T.appearance} />
       <Group>
-        {/* Theme — inline ThemeToggle instead of sheet */}
         <div className="px-4 py-3 flex items-center gap-3 min-h-[56px]">
           <Monitor className="h-5 w-5 text-muted-foreground shrink-0" />
-          <span className="text-[15px] font-medium text-foreground flex-1">Theme</span>
+          <span className="text-[15px] font-medium text-foreground flex-1">{T.theme}</span>
           <ThemeToggle />
         </div>
         <SettingRow
           icon={<Type className="h-5 w-5" />}
-          label="Text Size"
+          label={T.textSize}
           value={sizeLabel[textSize]}
           onClick={() => setSizeOpen(true)}
         />
       </Group>
 
       {/* 4 ── Preferences */}
-      <GroupHeader label="Preferences" />
+      <GroupHeader label={T.preferences} />
       <Group>
         <SettingRow
           icon={<Globe className="h-5 w-5" />}
-          label="Language"
+          label={T.language}
           value={localeLabel[locale]}
           onClick={() => setLangOpen(true)}
         />
         <SettingRow
           icon={<Info className="h-4 w-4" />}
-          label="Currency"
+          label={T.currency}
           value="UZS"
           noChevron
         />
       </Group>
 
       {/* 5 ── Data & Storage */}
-      <GroupHeader label="Data & Storage" />
+      <GroupHeader label={T.dataStorage} />
       <Group>
         <SettingRow
           icon={<ImageIcon className="h-5 w-5" />}
-          label="Image Quality"
+          label={T.imageQuality}
           value={qualityLabel[imageQuality]}
           onClick={() => setQualityOpen(true)}
         />
         <SettingRow
           icon={<Database className="h-5 w-5" />}
-          label="Clear Cache"
+          label={T.clearCache}
           noChevron
           onClick={() => setCacheOpen(true)}
         />
       </Group>
 
       {/* 6 ── About */}
-      <GroupHeader label="About" />
+      <GroupHeader label={T.about} />
       <Group>
-        <SettingRow icon={<Lock className="h-4 w-4" />} label="Privacy Policy"   href="/shop/profile" />
-        <SettingRow icon={<Info className="h-4 w-4" />} label="Terms of Service" href="/shop/profile" />
-        <SettingRow icon={<Star className="h-4 w-4" />} label="Rate iKiwi"       href="/shop/profile" />
-        <SettingRow label="Version" value="1.0.0" noChevron />
+        <SettingRow icon={<Lock className="h-4 w-4" />} label={T.privacyPolicy}  href="/shop/profile" />
+        <SettingRow icon={<Info className="h-4 w-4" />} label={T.termsOfService} href="/shop/profile" />
+        <SettingRow icon={<Star className="h-4 w-4" />} label={T.rateApp}        href="/shop/profile" />
+        <SettingRow label={T.version} value="1.0.0" noChevron />
       </Group>
 
       {/* 7 ── Danger Zone */}
-      <GroupHeader label="Danger Zone" />
+      <GroupHeader label={T.dangerZone} />
       <Group>
         <SettingRow
           icon={<Trash2 className="h-5 w-5" />}
-          label="Delete Account"
+          label={T.deleteAccount}
           danger noChevron
           onClick={() => setDeleteOpen(true)}
         />
@@ -357,13 +358,13 @@ export default function SettingsPage() {
       <PickerSheet
         open={sizeOpen}
         onClose={() => setSizeOpen(false)}
-        title="Text Size"
+        title={T.textSize}
         value={textSize}
         onChange={setTextSize}
         options={[
-          { value: "small"  as TextSize, label: "Small" },
-          { value: "medium" as TextSize, label: "Medium" },
-          { value: "large"  as TextSize, label: "Large" },
+          { value: "small"  as TextSize, label: T.sizeSmall },
+          { value: "medium" as TextSize, label: T.sizeMedium },
+          { value: "large"  as TextSize, label: T.sizeLarge },
         ]}
       />
 
@@ -371,7 +372,7 @@ export default function SettingsPage() {
       <PickerSheet
         open={langOpen}
         onClose={() => setLangOpen(false)}
-        title="Language"
+        title={T.language}
         value={locale}
         onChange={setLocale}
         options={[
@@ -385,13 +386,13 @@ export default function SettingsPage() {
       <PickerSheet
         open={qualityOpen}
         onClose={() => setQualityOpen(false)}
-        title="Image Quality"
+        title={T.imageQuality}
         value={imageQuality}
         onChange={setImageQuality}
         options={[
-          { value: "high"   as ImageQuality, label: "High",   subtitle: "Best quality, uses more data" },
-          { value: "medium" as ImageQuality, label: "Medium", subtitle: "Balanced" },
-          { value: "low"    as ImageQuality, label: "Low",    subtitle: "Saves data" },
+          { value: "high"   as ImageQuality, label: T.qualityHigh },
+          { value: "medium" as ImageQuality, label: T.qualityMedium },
+          { value: "low"    as ImageQuality, label: T.qualityLow },
         ]}
       />
 
@@ -399,14 +400,12 @@ export default function SettingsPage() {
       <AlertDialog open={cacheOpen} onOpenChange={setCacheOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear Cache?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Locally cached data will be removed. The app may load slower until data is re-fetched.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{T.clearCacheTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{T.clearCacheDesc}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleClearCache}>Clear</AlertDialogAction>
+            <AlertDialogCancel>{T.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleClearCache}>{T.clear}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -420,26 +419,23 @@ export default function SettingsPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600 dark:text-red-400">Delete Account</AlertDialogTitle>
-            <AlertDialogDescription>
-              This is permanent and cannot be undone. All shop data and orders will be erased.
-              Type <strong className="text-foreground">DELETE</strong> to confirm.
-            </AlertDialogDescription>
+            <AlertDialogTitle className="text-red-600 dark:text-red-400">{T.deleteAccountTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{T.deleteAccountDesc}</AlertDialogDescription>
           </AlertDialogHeader>
           <Input
             value={deleteInput}
             onChange={(e) => setDeleteInput(e.target.value)}
-            placeholder="Type DELETE to confirm"
+            placeholder={T.typeDeleteConfirm}
             className="mt-1"
           />
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{T.cancel}</AlertDialogCancel>
             <Button
               className="bg-red-600 hover:bg-red-700 text-white"
               disabled={deleteInput !== "DELETE"}
               onClick={handleDeleteAccount}
             >
-              Delete Account
+              {T.deleteAccount}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

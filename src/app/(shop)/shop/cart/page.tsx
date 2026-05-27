@@ -15,6 +15,8 @@ import { formatPrice } from "@/lib/utils";
 import { getMyShops, type MyShop } from "@/server/actions/shops";
 import { placeOrder } from "@/server/actions/orders";
 import { useCartStore } from "@/store/cartStore";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 import type { CartItem } from "@/types";
 
 function SwipeableCartItem({
@@ -81,6 +83,8 @@ function SwipeableCartItem({
 
 export default function CartPage() {
   const router = useRouter();
+  const locale = useLocaleStore((s) => s.locale);
+  const T = useTranslations(locale);
   const { items, addItem, updateQty, removeItem, clearCart } = useCartStore();
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -136,11 +140,11 @@ export default function CartPage() {
       <div className="py-24 text-center space-y-4">
         <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground/30" />
         <div>
-          <p className="font-semibold text-lg">Your cart is empty</p>
-          <p className="text-sm text-muted-foreground mt-1">Add products from the catalog</p>
+          <p className="font-semibold text-lg">{T.emptyCart}</p>
+          <p className="text-sm text-muted-foreground mt-1">{T.emptyCartSub}</p>
         </div>
         <Button onClick={() => router.push("/shop")} className="bg-primary hover:bg-primary/90">
-          Browse Catalog
+          {T.browseCatalog}
         </Button>
       </div>
     );
@@ -149,13 +153,13 @@ export default function CartPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">Your Cart</h1>
+        <h1 className="text-lg font-bold">{T.yourCart}</h1>
         <p className="text-sm text-muted-foreground">
-          {items.length} product{items.length !== 1 ? "s" : ""}
+          {items.length} {T.products.toLowerCase()}
         </p>
       </div>
 
-      <p className="text-xs text-muted-foreground">← Swipe left to remove an item</p>
+      <p className="text-xs text-muted-foreground">{T.swipeToRemove}</p>
 
       <div className="space-y-2">
         <AnimatePresence initial={false}>
@@ -182,12 +186,12 @@ export default function CartPage() {
 
       {/* Deliver to — shop selector */}
       <div>
-        <Label className="text-sm mb-2 block">Deliver to</Label>
+        <Label className="text-sm mb-2 block">{T.deliverTo}</Label>
         {shops.filter((s) => s.isActive).length === 0 ? (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-            You have no active shops.{" "}
+            {T.noActiveShops}{" "}
             <Link href="/shop/profile" className="underline font-medium">
-              Add one in your profile.
+              {T.addShopInProfile}
             </Link>
           </div>
         ) : (
@@ -204,7 +208,7 @@ export default function CartPage() {
                   <p className="text-xs text-muted-foreground truncate">{selectedShop.address}</p>
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">Tap to select delivery shop</p>
+                <p className="text-sm text-muted-foreground">{T.tapSelectShop}</p>
               )}
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -215,30 +219,28 @@ export default function CartPage() {
       {/* Disclaimer */}
       <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 flex gap-2">
         <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-800">
-          Quantities shown are estimates. Staff will confirm exact weights/counts and notify you of the final cost.
-        </p>
+        <p className="text-xs text-amber-800">{T.qtyEstimate}</p>
       </div>
 
       {/* Order summary */}
       <div className="rounded-xl bg-card border border-border shadow-sm p-4 space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Products</span>
+          <span className="text-muted-foreground">{T.products}</span>
           <span>{items.length}</span>
         </div>
         <Separator />
         <div className="flex justify-between font-bold pt-1">
-          <span>Estimated Total</span>
+          <span>{T.estimatedTotal}</span>
           <span className="text-primary text-lg">{formatPrice(total)}</span>
         </div>
       </div>
 
       {/* Notes */}
       <div className="space-y-2">
-        <Label htmlFor="notes">Order notes (optional)</Label>
+        <Label htmlFor="notes">{T.orderNotes}</Label>
         <Textarea
           id="notes"
-          placeholder="Special requests, delivery time, etc…"
+          placeholder={T.orderNotesPlaceholder}
           rows={3}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -252,7 +254,7 @@ export default function CartPage() {
           className="shrink-0 text-destructive border-destructive/30 hover:bg-destructive/5"
           onClick={clearCart}
         >
-          <Trash2 className="h-4 w-4 mr-1.5" /> Clear
+          <Trash2 className="h-4 w-4 mr-1.5" /> {T.clearCart}
         </Button>
         <Button
           onClick={handlePlaceOrder}
@@ -260,7 +262,7 @@ export default function CartPage() {
           className="flex-1 bg-primary hover:bg-primary/90"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-          {selectedShopId ? `Place Order · ${formatPrice(total)}` : "Select shop to order"}
+          {selectedShopId ? `${T.placeOrder} · ${formatPrice(total)}` : T.selectShopToOrder}
         </Button>
       </div>
 

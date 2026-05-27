@@ -7,7 +7,6 @@ import {
   RotateCw, Search, ShoppingCart, Sparkles, X,
 } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import {
   useEffect, useMemo, useRef, useState,
 } from "react";
@@ -17,9 +16,9 @@ import { CoachMarks } from "@/components/shop/CoachMarks";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ProductSheet } from "@/components/shop/ProductSheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getPusherClient } from "@/lib/pusherClient";
 import { getCategoryName, formatPrice } from "@/lib/utils";
 import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 import { useCartStore } from "@/store/cartStore";
 import { useFavoritesStore } from "@/store/favoritesStore";
 import type { Product } from "@/types";
@@ -41,12 +40,12 @@ async function fetchRecentOrder() {
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
-function getGreeting(name: string) {
+function getGreeting(name: string, T: { goodMorning: string; goodAfternoon: string; goodEvening: string; workingLate: string }) {
   const h = new Date().getHours();
-  if (h < 12) return { text: `Good morning, ${name}`, emoji: "☀️" };
-  if (h < 17) return { text: `Good afternoon, ${name}`, emoji: "👋" };
-  if (h < 21) return { text: `Good evening, ${name}`, emoji: "🌆" };
-  return { text: `Working late, ${name}?`, emoji: "🌙" };
+  if (h < 12) return { text: `${T.goodMorning}, ${name}`, emoji: "☀️" };
+  if (h < 17) return { text: `${T.goodAfternoon}, ${name}`, emoji: "👋" };
+  if (h < 21) return { text: `${T.goodEvening}, ${name}`, emoji: "🌆" };
+  return { text: `${T.workingLate}, ${name}?`, emoji: "🌙" };
 }
 
 function getTodayLabel(locale: string) {
@@ -246,6 +245,7 @@ function SearchOverlay({ products, onClose }: {
   onClose: (query?: string) => void;
 }) {
   const locale = useLocaleStore((s) => s.locale);
+  const TSearch = useTranslations(locale);
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -309,7 +309,7 @@ function SearchOverlay({ products, onClose }: {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && commit(query)}
-            placeholder="Search products…"
+            placeholder={TSearch.searchProducts}
             className="w-full rounded-xl bg-muted pl-9 pr-10 py-2.5 text-[15px] outline-none placeholder:text-muted-foreground"
           />
           {query && (
@@ -333,11 +333,10 @@ function SearchOverlay({ products, onClose }: {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {/* Live suggestions */}
         {suggestions.length > 0 ? (
           <div className="py-2">
             <p className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Suggestions
+              {TSearch.suggestions}
             </p>
             {suggestions.map((p) => (
               <button
@@ -356,14 +355,13 @@ function SearchOverlay({ products, onClose }: {
           </div>
         ) : query.trim().length > 0 ? (
           <div className="px-4 py-8 text-center text-muted-foreground">
-            <p className="text-[15px]">No results for &ldquo;{query}&rdquo;</p>
-            <p className="text-[13px] mt-1">Try a different name</p>
+            <p className="text-[15px]">{TSearch.noResults} &ldquo;{query}&rdquo;</p>
           </div>
         ) : recentSearches.length > 0 ? (
           <div className="py-2">
             <div className="flex items-center justify-between px-4 py-2">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Recent
+                {TSearch.recent}
               </p>
               <button
                 type="button"
@@ -373,7 +371,7 @@ function SearchOverlay({ products, onClose }: {
                 }}
                 className="text-[12px] text-primary"
               >
-                Clear
+                {TSearch.clearAll}
               </button>
             </div>
             {recentSearches.map((s) => (
@@ -391,7 +389,7 @@ function SearchOverlay({ products, onClose }: {
         ) : (
           <div className="px-4 py-10 text-center text-muted-foreground">
             <Search className="h-10 w-10 mx-auto opacity-20 mb-3" />
-            <p className="text-[14px]">Search for vegetables, fruits, and more</p>
+            <p className="text-[14px]">{TSearch.searchVeg}</p>
           </div>
         )}
       </div>
@@ -404,9 +402,11 @@ function SearchOverlay({ products, onClose }: {
 function RecommendationsCarousel({
   products,
   onSelect,
+  label,
 }: {
   products: Product[];
   onSelect: (p: Product) => void;
+  label: string;
 }) {
   if (products.length === 0) return null;
 
@@ -414,7 +414,7 @@ function RecommendationsCarousel({
     <div className="mt-2">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="text-[15px] font-bold text-[#1A1A1A]">You might also like</h2>
+        <h2 className="text-[15px] font-bold text-[#1A1A1A]">{label}</h2>
       </div>
       <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
         {products.map((p) => {
@@ -448,10 +448,14 @@ function FavouritesCarousel({
   products,
   onSelect,
   locale,
+  favLabel,
+  savedLabel,
 }: {
   products: Product[];
   onSelect: (p: Product) => void;
   locale: string;
+  favLabel: string;
+  savedLabel: string;
 }) {
   if (products.length === 0) return null;
 
@@ -463,9 +467,9 @@ function FavouritesCarousel({
     >
       <div className="flex items-center gap-2 mb-3">
         <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-        <h2 className="text-[15px] font-bold text-foreground">Your Favourites</h2>
+        <h2 className="text-[15px] font-bold text-foreground">{favLabel}</h2>
         <span className="ml-auto text-[12px] text-muted-foreground">
-          {products.length} saved
+          {products.length} {savedLabel}
         </span>
       </div>
       <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
@@ -534,9 +538,9 @@ function useRotatingPlaceholder() {
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ShopHomePage() {
-  const { data: session } = useSession();
   const qc = useQueryClient();
   const locale = useLocaleStore((s) => s.locale);
+  const T = useTranslations(locale);
   const cartItems = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
   const favoriteIds = useFavoritesStore((s) => s.ids);
@@ -576,16 +580,6 @@ export default function ShopHomePage() {
     staleTime: 60_000,
   });
 
-  // Pusher live prices
-  const shopId = (session?.user as { shopId?: string } | undefined)?.shopId;
-  useEffect(() => {
-    if (!shopId) return;
-    const pusher = getPusherClient();
-    if (!pusher) return;
-    const ch = pusher.subscribe(`private-shop-${shopId}`);
-    ch.bind("prices-updated", () => qc.invalidateQueries({ queryKey: ["products"] }));
-    return () => { ch.unbind_all(); pusher.unsubscribe(`private-shop-${shopId}`); };
-  }, [shopId, qc]);
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -658,8 +652,7 @@ export default function ShopHomePage() {
     .filter((p) => p.isAvailable && p.categoryId === recommendedCatId && p.pricePerKg != null)
     .slice(0, 8);
 
-  const greeting = getGreeting(session?.user?.name?.split(" ")[0] ?? "there");
-  const userName = session?.user?.name ?? "Shop Owner";
+  const greeting = getGreeting("👋", T);
 
   if (isLoading) {
     return (
@@ -765,6 +758,8 @@ export default function ShopHomePage() {
             products={products.filter((p) => favoriteIds.includes(p.id))}
             onSelect={setSelected}
             locale={locale}
+            favLabel={T.yourFavourites}
+            savedLabel={T.saved}
           />
         )}
 
@@ -772,7 +767,7 @@ export default function ShopHomePage() {
         {!isLoading && products.length > 0 && !products.some((p) => p.isAvailable && (p.pricePerKg != null || p.pricePerPiece != null)) && (
           <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-            <p className="text-[13px] text-amber-800">Today's prices haven't been set yet. Check back soon.</p>
+            <p className="text-[13px] text-amber-800">{T.noPricesAlert}</p>
           </div>
         )}
 
@@ -794,14 +789,14 @@ export default function ShopHomePage() {
         {filtered.length === 0 ? (
           <div className="py-16 text-center text-muted-foreground">
             <p className="text-4xl mb-3">🥬</p>
-            <p className="text-[15px] font-medium">No products found</p>
+            <p className="text-[15px] font-medium">{T.noProductsFound}</p>
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
                 className="mt-2 text-[13px] text-primary underline"
               >
-                Clear search
+                {T.clearSearch}
               </button>
             )}
           </div>
@@ -848,7 +843,7 @@ export default function ShopHomePage() {
         )}
 
         {/* 8 ── Recommendations */}
-        <RecommendationsCarousel products={recommendations} onSelect={setSelected} />
+        <RecommendationsCarousel products={recommendations} onSelect={setSelected} label={T.youMightLike} />
       </div>
 
       {/* Product detail sheet */}
