@@ -120,7 +120,7 @@ export function DriverShell({
         <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-base">iK</span>
+              <span className="text-primary-foreground font-bold text-base">iK</span>
             </div>
             <div className="leading-none">
               <p className="font-bold text-sm">iKiwi</p>

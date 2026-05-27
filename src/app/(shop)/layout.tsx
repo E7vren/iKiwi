@@ -18,7 +18,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
           <p className="text-muted-foreground">
             You don&apos;t have any active shops yet. Add a shop in your profile, or wait for admin approval if your shop was recently deactivated.
           </p>
-          <a href="/shop/profile" className="inline-block mt-4 px-6 py-2 rounded-full bg-primary text-white text-sm font-medium">
+          <a href="/shop/profile" className="inline-block mt-4 px-6 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium">
             Go to Profile
           </a>
         </div>

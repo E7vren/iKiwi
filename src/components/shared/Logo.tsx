@@ -11,7 +11,7 @@ export function Logo({ size = 40, className, showText = true }: LogoProps) {
     <div className={cn("flex items-center gap-2.5", className)}>
       <KiwiIcon size={size} />
       {showText && (
-        <span className="text-lg font-extrabold tracking-tight text-gray-900">
+        <span className="text-lg font-extrabold tracking-tight text-foreground">
           i<span className="text-[#2e7d32]">K</span>i<span className="text-[#2e7d32]">W</span>i
         </span>
       )}

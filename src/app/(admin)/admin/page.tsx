@@ -242,7 +242,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <div className="divide-y">
             {data.pendingOrdersList.map((o) => (
-              <div key={o.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50">
+              <div key={o.id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/40">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{o.shopName}</p>
                   <p className="text-xs text-muted-foreground">
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
             data.recentOrders.map((o) => (
               <div
                 key={o.id}
-                className="flex items-center justify-between px-5 py-3 hover:bg-gray-50"
+                className="flex items-center justify-between px-5 py-3 hover:bg-muted/40"
               >
                 <div>
                   <p className="text-sm font-medium">{o.shopName}</p>
