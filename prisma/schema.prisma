@@ -1,0 +1,521 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  COMPANY_ADMIN
+  SHOP_OWNER
+  DELIVERY_STAFF
+  WAREHOUSE_STAFF
+}
+
+enum UnitType {
+  KG
+  PIECE
+  BOTH
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  PARTIALLY_DELIVERED
+  CANCELLED
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  CAR
+  VAN
+  TRUCK
+}
+
+enum RouteStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StopStatus {
+  PENDING
+  ARRIVED
+  VERIFYING
+  COMPLETED
+  PARTIAL_RETURN
+  FULL_RETURN
+  SKIPPED
+}
+
+enum ReturnReason {
+  BAD_QUALITY
+  WRONG_PRODUCT
+  DAMAGED
+  EXPIRED
+  CUSTOMER_REFUSED
+  OTHER
+}
+
+enum NotificationType {
+  ORDER_PLACED
+  PRICE_UPDATED
+  STATUS_CHANGED
+  ACTUAL_COST_SET
+  PRICE_ALERT
+  ROUTE_ASSIGNED
+  DRIVER_EN_ROUTE
+  DRIVER_ARRIVED
+  RETURN_PROCESSED
+  DELIVERY_COMPLETED
+  LOW_STOCK_ALERT
+  ORDER_SHORTAGE_ALERT
+  RESTOCK_ASSIGNED
+  RESTOCK_COMPLETED
+  STOCK_ADJUSTED
+}
+
+enum AlertThresholdType {
+  BELOW
+  ABOVE
+}
+
+enum MovementType {
+  INITIAL_STOCK
+  RESTOCK
+  RESERVED
+  RELEASED
+  CONSUMED
+  RETURN
+  ADJUSTMENT
+  WASTE
+  THEFT
+  COUNT_CORRECTION
+}
+
+enum RestockStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RestockPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RestockTrigger {
+  AUTO_LOW_STOCK
+  ORDER_SHORTAGE
+  MANUAL
+  SCHEDULED
+}
+
+// ─── Auth.js required tables ──────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── App models ───────────────────────────────────────────────────────────────
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  emailVerified  DateTime?
+  password       String?
+  image          String?
+  role           Role            @default(SHOP_OWNER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  shops          Shop[]
+  deliveryStaff  DeliveryStaff?
+  warehouseStaff WarehouseStaff?
+  notifications  Notification[]
+  dailyPrices    DailyPrice[]
+
+  @@map("users")
+}
+
+model Shop {
+  id             String          @id @default(cuid())
+  name           String
+  ownerName      String
+  phone          String
+  address        String
+  latitude       Decimal         @db.Decimal(9, 6)
+  longitude      Decimal         @db.Decimal(9, 6)
+  isActive       Boolean         @default(true)
+  userId         String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders         Order[]
+  favorites      Favorite[]
+  orderTemplates OrderTemplate[]
+  priceAlerts    PriceAlert[]
+
+  @@map("shops")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  nameEn    String
+  nameUz    String
+  nameRu    String?
+  slug      String    @unique
+  icon      String?
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  name          String
+  nameUz        String        @default("")
+  nameRu        String?
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  unitType      UnitType      @default(KG)
+  pricePerKg    Decimal?      @db.Decimal(12, 0)
+  pricePerPiece Decimal?      @db.Decimal(12, 0)
+  imageUrl      String?
+  isAvailable   Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  dailyPrices   DailyPrice[]
+  orderItems    OrderItem[]
+  favorites     Favorite[]
+  priceAlerts   PriceAlert[]
+  stockItem     StockItem?
+  restockItems  RestockItem[]
+
+  @@map("products")
+}
+
+model DailyPrice {
+  id            String   @id @default(cuid())
+  productId     String
+  pricePerKg    Decimal? @db.Decimal(12, 0)
+  pricePerPiece Decimal? @db.Decimal(12, 0)
+  date          DateTime @db.Date
+  adminId       String
+  createdAt     DateTime @default(now())
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  admin         User     @relation(fields: [adminId], references: [id])
+
+  @@unique([productId, date])
+  @@map("daily_prices")
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  shopId         String
+  status         OrderStatus @default(PENDING)
+  estimatedTotal Decimal     @db.Decimal(12, 0)
+  actualTotal    Decimal?    @db.Decimal(12, 0)
+  deliveredTotal Decimal?    @db.Decimal(12, 0)
+  deliveryFee    Decimal?    @db.Decimal(12, 0)
+  notes          String?
+  finalCostNote  String?
+  deliveryNote   String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  shop           Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  items          OrderItem[]
+  routeStop      RouteStop?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id              String        @id @default(cuid())
+  orderId         String
+  productId       String
+  orderedAs       UnitType
+  requestedKg     Decimal?      @db.Decimal(6, 2)
+  requestedPieces Int?
+  actualKg        Decimal?      @db.Decimal(6, 2)
+  actualPieces    Int?
+  estimatedPrice  Decimal       @db.Decimal(12, 0)
+  actualPrice     Decimal?      @db.Decimal(12, 0)
+  adminAdjusted   Boolean       @default(false)
+  adminNote       String?
+  deliveredKg     Decimal?      @db.Decimal(6, 2)
+  deliveredPieces Int?
+  returnedKg      Decimal?      @db.Decimal(6, 2)
+  returnedPieces  Int?
+  returnReason    ReturnReason?
+  returnNote      String?
+  finalPrice      Decimal?      @db.Decimal(12, 0)
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String?
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([shopId, productId])
+  @@map("favorites")
+}
+
+model OrderTemplate {
+  id        String   @id @default(cuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  name      String
+  emoji     String?
+  items     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_templates")
+}
+
+model PriceAlert {
+  id             String             @id @default(cuid())
+  shopId         String
+  shop           Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  thresholdType  AlertThresholdType
+  thresholdPrice Decimal            @db.Decimal(12, 0)
+  isActive       Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+
+  @@unique([shopId, productId])
+  @@map("price_alerts")
+}
+
+model DeliveryStaff {
+  id           String      @id @default(cuid())
+  userId       String      @unique
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  phone        String
+  vehicleType  VehicleType @default(CAR)
+  vehiclePlate String?
+  isActive     Boolean     @default(true)
+  isAvailable  Boolean     @default(false)
+  currentLat   Float?
+  currentLng   Float?
+  lastSeenAt   DateTime?
+  routes       Route[]
+  createdAt    DateTime    @default(now())
+
+  @@map("delivery_staff")
+}
+
+model Route {
+  id               String         @id @default(cuid())
+  date             DateTime       @db.Date
+  staffId          String?
+  staff            DeliveryStaff? @relation(fields: [staffId], references: [id])
+  status           RouteStatus    @default(PLANNED)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  totalDistanceKm  Decimal?       @db.Decimal(8, 2)
+  estimatedMinutes Int?
+  stops            RouteStop[]
+  createdAt        DateTime       @default(now())
+
+  @@map("routes")
+}
+
+model RouteStop {
+  id          String     @id @default(cuid())
+  routeId     String
+  route       Route      @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  orderId     String     @unique
+  order       Order      @relation(fields: [orderId], references: [id])
+  sequence    Int
+  status      StopStatus @default(PENDING)
+  arrivedAt   DateTime?
+  completedAt DateTime?
+  driverNote  String?
+
+  @@map("route_stops")
+}
+
+// ─── Warehouse models ─────────────────────────────────────────────────────────
+
+model WarehouseStaff {
+  id            String          @id @default(cuid())
+  userId        String          @unique
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String
+  phone         String
+  isActive      Boolean         @default(true)
+  assignedTasks RestockTask[]
+  movements     StockMovement[]
+  createdAt     DateTime        @default(now())
+
+  @@map("warehouse_staff")
+}
+
+model StockItem {
+  id               String          @id @default(cuid())
+  productId        String          @unique
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  availableKg      Decimal?        @db.Decimal(10, 2)
+  availablePieces  Int?
+
+  reservedKg       Decimal?        @db.Decimal(10, 2) @default(0)
+  reservedPieces   Int?            @default(0)
+
+  minStockKg       Decimal?        @db.Decimal(10, 2)
+  minStockPieces   Int?
+
+  targetStockKg    Decimal?        @db.Decimal(10, 2)
+  targetStockPieces Int?
+
+  supplierName     String?
+  supplierPrice    Decimal?        @db.Decimal(12, 0)
+
+  lastRestockedAt  DateTime?
+  updatedAt        DateTime        @updatedAt
+
+  movements        StockMovement[]
+
+  @@map("stock_items")
+}
+
+model StockMovement {
+  id               String          @id @default(cuid())
+  stockItemId      String
+  stockItem        StockItem       @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  type             MovementType
+
+  deltaKg          Decimal?        @db.Decimal(10, 2)
+  deltaPieces      Int?
+
+  newBalanceKg     Decimal?        @db.Decimal(10, 2)
+  newBalancePieces Int?
+
+  orderId          String?
+  restockTaskId    String?
+
+  performedBy      String
+  performedByRole  Role
+
+  reason           String?
+  note             String?
+  createdAt        DateTime        @default(now())
+
+  warehouseStaffId String?
+  warehouseStaff   WarehouseStaff? @relation(fields: [warehouseStaffId], references: [id])
+
+  @@map("stock_movements")
+}
+
+model RestockTask {
+  id             String          @id @default(cuid())
+  items          RestockItem[]
+  assignedToId   String?
+  assignedTo     WarehouseStaff? @relation(fields: [assignedToId], references: [id])
+  status         RestockStatus   @default(PENDING)
+  priority       RestockPriority @default(NORMAL)
+  triggerType    RestockTrigger
+  triggerOrderId String?
+  adminNote      String?
+  staffNote      String?
+  estimatedCost  Decimal?        @db.Decimal(12, 0)
+  createdAt      DateTime        @default(now())
+  assignedAt     DateTime?
+  completedAt    DateTime?
+
+  @@map("restock_tasks")
+}
+
+model RestockItem {
+  id                String      @id @default(cuid())
+  restockTaskId     String
+  restockTask       RestockTask @relation(fields: [restockTaskId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product     @relation(fields: [productId], references: [id])
+  neededKg          Decimal?    @db.Decimal(10, 2)
+  neededPieces      Int?
+  receivedKg        Decimal?    @db.Decimal(10, 2)
+  receivedPieces    Int?
+  pricePaidPerKg    Decimal?    @db.Decimal(12, 0)
+  pricePaidPerPiece Decimal?    @db.Decimal(12, 0)
+  isReceived        Boolean     @default(false)
+
+  @@map("restock_items")
+}
