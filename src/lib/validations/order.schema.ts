@@ -23,6 +23,7 @@ const orderItemSchema = z.discriminatedUnion("orderedAs", [
 ]);
 
 export const createOrderSchema = z.object({
+  shopId: z.string().min(1, "Shop is required"),
   items: z.array(orderItemSchema).min(1, "Order must have at least one item"),
   notes: z.string().max(500).optional(),
 });
@@ -35,6 +36,7 @@ export const updateOrderStatusSchema = z.object({
 export const setActualCostSchema = z.object({
   orderId: z.string().min(1),
   saveDraft: z.boolean().optional(),
+  deliveryFee: z.number().int().min(0).optional(),
   items: z.array(
     z.object({
       orderItemId: z.string().min(1),

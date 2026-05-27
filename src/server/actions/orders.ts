@@ -36,18 +36,19 @@ function todayUTC() {
 export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: string }>> {
   const session = await auth();
   if (session?.user?.role !== "SHOP_OWNER") return { success: false, error: "Forbidden" };
-  if (!session.user.shopId) return { success: false, error: "No shop linked to your account" };
-  const shopId = session.user.shopId;
-
-  const shop = await prisma.shop.findUnique({
-    where: { id: shopId },
-    select: { isActive: true },
-  });
-  if (!shop?.isActive) return { success: false, error: "Your shop is not yet approved" };
 
   const parsed = createOrderSchema.safeParse(input);
   if (!parsed.success)
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation error" };
+
+  // Validate that the given shopId belongs to this user and is active
+  const shop = await prisma.shop.findFirst({
+    where: { id: parsed.data.shopId, userId: session.user.id, isActive: true },
+    select: { id: true },
+  });
+  if (!shop) return { success: false, error: "Invalid or inactive shop" };
+
+  const shopId = shop.id;
 
   const today = todayUTC();
   const productIds = parsed.data.items.map((i) => i.productId);
@@ -59,7 +60,7 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
     },
   });
 
-  let estimatedTotal = 0;
+  let estimatedSubtotal = 0;
   const itemsData: Array<{
     productId: string;
     orderedAs: "KG" | "PIECE";
@@ -113,8 +114,11 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
       });
     }
 
-    estimatedTotal += lineTotal;
+    estimatedSubtotal += lineTotal;
   }
+
+  const estimatedTotal = estimatedSubtotal;
+  const deliveryFee = Math.round(estimatedSubtotal * (estimatedSubtotal >= 1_000_000 ? 0.05 : 0.10));
 
   const { order, admins } = await prisma.$transaction(
     async (
@@ -127,6 +131,7 @@ export async function placeOrder(input: CreateOrderInput): Promise<Result<{ id: 
         data: {
           shopId,
           estimatedTotal,
+          deliveryFee,
           notes: parsed.data.notes ?? null,
           items: { create: itemsData },
         },
@@ -374,6 +379,7 @@ export async function setActualCost(
       data: {
         ...(saveDraft ? {} : { status: "READY" }),
         actualTotal,
+        ...(parsed.data.deliveryFee != null ? { deliveryFee: parsed.data.deliveryFee } : {}),
         finalCostNote: parsed.data.finalCostNote ?? null,
       },
     });
@@ -458,6 +464,7 @@ export async function getOrderById(orderId: string) {
           address: true,
           latitude: true,
           longitude: true,
+          userId: true,
         },
       },
       items: {
@@ -488,7 +495,7 @@ export async function getOrderById(orderId: string) {
   });
 
   if (!row) return null;
-  if (session.user.role === "SHOP_OWNER" && row.shopId !== session.user.shopId) return null;
+  if (session.user.role === "SHOP_OWNER" && row.shop.userId !== session.user.id) return null;
 
   return {
     ...row,
@@ -497,6 +504,7 @@ export async function getOrderById(orderId: string) {
     estimatedTotal: Number(row.estimatedTotal),
     actualTotal: row.actualTotal != null ? Number(row.actualTotal) : null,
     deliveredTotal: row.deliveredTotal != null ? Number(row.deliveredTotal) : null,
+    deliveryFee: row.deliveryFee != null ? Number(row.deliveryFee) : null,
     deliveryNote: row.deliveryNote,
     shop: {
       id: row.shop.id,
@@ -553,7 +561,7 @@ export async function getMyOrders(page = 1, limit = 30) {
   const session = await auth();
   if (session?.user?.role !== "SHOP_OWNER") return { orders: [], total: 0 };
 
-  const where = { shopId: session.user.shopId ?? "" };
+  const where = { shop: { userId: session.user.id } };
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
       where,
@@ -671,6 +679,32 @@ export async function getTomorrowOrders() {
   }));
 }
 
+export async function updateOrderShop(
+  orderId: string,
+  shopId: string
+): Promise<Result<void>> {
+  const session = await auth();
+  if (session?.user?.role !== "SHOP_OWNER") return { success: false, error: "Forbidden" };
+
+  // Verify the order belongs to this user and is still PENDING
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, shop: { userId: session.user.id }, status: "PENDING" },
+    select: { id: true },
+  });
+  if (!order) return { success: false, error: "Order not found or already confirmed" };
+
+  // Verify the new shop belongs to this user and is active
+  const newShop = await prisma.shop.findFirst({
+    where: { id: shopId, userId: session.user.id, isActive: true },
+    select: { id: true },
+  });
+  if (!newShop) return { success: false, error: "Invalid shop" };
+
+  await prisma.order.update({ where: { id: orderId }, data: { shopId } });
+  revalidatePath("/shop/orders");
+  return { success: true, data: undefined };
+}
+
 function formatOrder(order: OrderRow) {
   return {
     ...order,
@@ -678,6 +712,7 @@ function formatOrder(order: OrderRow) {
     updatedAt: order.updatedAt.toISOString(),
     estimatedTotal: Number(order.estimatedTotal),
     actualTotal: order.actualTotal != null ? Number(order.actualTotal) : null,
+    deliveryFee: order.deliveryFee != null ? Number(order.deliveryFee) : null,
     items: order.items.map((i) => ({
       ...i,
       orderedAs: i.orderedAs as "KG" | "PIECE",
