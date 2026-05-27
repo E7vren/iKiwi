@@ -475,10 +475,12 @@ export default function AdminRoutesPage() {
 
       {/* Map toggle */}
       <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-        <button
-          type="button"
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+        <div
+          role="button"
+          tabIndex={0}
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
           onClick={() => setMapOpen((o) => !o)}
+          onKeyDown={(e) => e.key === "Enter" && setMapOpen((o) => !o)}
         >
           <div className="flex items-center gap-2">
             <MapIcon className="h-4 w-4 text-primary" />
@@ -525,7 +527,7 @@ export default function AdminRoutesPage() {
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
-        </button>
+        </div>
         {mapOpen && (
           <div className="h-96 border-t">
             <RouteMap
