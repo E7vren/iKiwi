@@ -7,13 +7,13 @@ import { auth } from "@/lib/auth";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  if (session.user.role !== "COMPANY_ADMIN") redirect("/");
+  if (session.user.role !== "COMPANY_ADMIN") redirect("/admin");
 
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-end gap-1 border-b bg-card px-6 shadow-sm">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-end gap-1 border-b border-border bg-card px-6 shadow-[0px_1px_4px_rgba(0,0,0,0.04)]">
           <ThemeToggleIcon />
           <NotifBell />
         </header>
