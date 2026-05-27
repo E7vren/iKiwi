@@ -24,7 +24,7 @@
   --color-danger:            #c62828;
 
   /* Typography */
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-hanken);
   --font-mono: var(--font-geist-mono);
 
   /* Radius */
@@ -75,8 +75,8 @@ html[data-text-size="large"]  { font-size: 18px; }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 
 @theme inline {
-  --font-heading:           var(--font-sans);
-  --font-sans:           var(--font-sans);
+  --font-heading:           var(--font-hanken);
+  --font-sans:           var(--font-hanken);
   --color-sidebar-ring:           var(--sidebar-ring);
   --color-sidebar-border:           var(--sidebar-border);
   --color-sidebar-accent-foreground:           var(--sidebar-accent-foreground);

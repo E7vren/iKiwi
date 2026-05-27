@@ -8,7 +8,7 @@ import { ThemeController } from "@/components/shared/ThemeController";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-hanken",
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
