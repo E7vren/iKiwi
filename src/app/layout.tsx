@@ -1,17 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { Providers } from "./providers";
 import { ThemeController } from "@/components/shared/ThemeController";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
-const inter = Inter({
-  variable: "--font-inter",
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
+  variable: "--font-sans",
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -31,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#16a34a",
+  themeColor: "#456800",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -39,15 +38,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
-      <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={cn("font-sans", hanken.variable)}>
+      <body className={`${geistMono.variable} antialiased`}>
         <Providers>
           <ThemeController />
           {children}
           <Toaster
             position="top-right"
             toastOptions={{
-              style: { borderRadius: "0.75rem" },
+              style: { borderRadius: "0.5rem" },
             }}
             richColors
           />
