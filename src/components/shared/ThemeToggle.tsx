@@ -38,6 +38,8 @@ const options = [
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <div
@@ -46,7 +48,7 @@ export function ThemeToggle() {
       className="flex rounded-xl border border-border bg-muted p-1 gap-1"
     >
       {options.map(({ value, label, icon: Icon }) => {
-        const active = theme === value;
+        const active = mounted && theme === value;
         return (
           <button
             key={value}
