@@ -32,7 +32,9 @@ export function TopBar({ userName }: Props) {
     <header
       className={cn(
         "sticky top-0 z-30 bg-background border-b border-transparent transition-all duration-200",
-        scrolled ? "border-border shadow-[0_1px_8px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.3)]" : ""
+        scrolled
+          ? "border-border shadow-[0_1px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.25)]"
+          : ""
       )}
     >
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
@@ -43,9 +45,10 @@ export function TopBar({ userName }: Props) {
           <ThemeToggleIcon />
           <Link
             href="/shop/profile"
-            className="h-9 w-9 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity"
+            className="h-9 w-9 rounded-full bg-primary flex items-center justify-center hover:bg-primary/90 transition-colors"
+            aria-label="Profile"
           >
-            <span className="text-white text-sm font-bold leading-none tracking-wide">
+            <span className="text-primary-foreground text-sm font-bold leading-none tracking-wide">
               {initials(userName)}
             </span>
           </Link>
