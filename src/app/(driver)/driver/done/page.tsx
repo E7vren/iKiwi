@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -136,7 +136,7 @@ function SummaryContent() {
 
       <a
         href="/driver"
-        className="h-14 px-10 rounded-full bg-primary text-white text-lg font-semibold flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        className="h-14 px-10 rounded-full bg-primary text-primary-foreground text-lg font-semibold flex items-center justify-center shadow-md active:scale-95 transition-transform"
       >
         Back to Home
       </a>

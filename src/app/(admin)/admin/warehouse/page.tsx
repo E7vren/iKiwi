@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -104,7 +104,7 @@ function StatsRow({ data }: { data: StockRow[] }) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{value}</div>
+            <div className="text-data-display">{value}</div>
           </CardContent>
         </Card>
       ))}
@@ -613,7 +613,7 @@ export default function WarehousePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Stock Overview</h1>
+        <h1 className="text-headline-lg">Stock Overview</h1>
         <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           {[1, 2, 3, 4].map((k) => <Skeleton key={k} className="h-28 rounded-xl" />)}
         </div>
@@ -627,7 +627,7 @@ export default function WarehousePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Stock Overview</h1>
+      <h1 className="text-headline-lg">Stock Overview</h1>
 
       {data && <StatsRow data={data} />}
 

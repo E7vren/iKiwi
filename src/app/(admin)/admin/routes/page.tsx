@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -94,7 +94,7 @@ function StatCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-data-display">{value}</div>
       </CardContent>
     </Card>
   );
@@ -406,7 +406,7 @@ export default function AdminRoutesPage() {
       {/* Header */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">Delivery Routes</h1>
+          <h1 className="text-headline-lg">Delivery Routes</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Plan and monitor daily deliveries</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -623,7 +623,7 @@ export default function AdminRoutesPage() {
                     onClick={() => setOptMode(mode)}
                     className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                       optMode === mode
-                        ? "bg-primary text-white border-primary"
+                        ? "bg-primary text-primary-foreground border-primary"
                         : "bg-white border-gray-200 text-muted-foreground hover:border-primary/40"
                     }`}
                   >

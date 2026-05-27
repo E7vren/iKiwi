@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { LogOut, Mail, ShieldCheck, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
@@ -28,7 +28,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-headline-lg">Settings</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Manage your account and display preferences
         </p>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ChevronRight, Loader2, MapPin, Navigation, Package } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,7 @@ function OfflineState({ onGoOnline }: { onGoOnline: () => void }) {
       <button
         type="button"
         onClick={onGoOnline}
-        className="h-14 px-10 rounded-full bg-primary text-white text-lg font-semibold shadow-md active:scale-95 transition-transform"
+        className="h-14 px-10 rounded-full bg-primary text-primary-foreground text-lg font-semibold shadow-md active:scale-95 transition-transform"
       >
         Go Online
       </button>
@@ -84,7 +84,7 @@ function RouteReadyState({
           type="button"
           onClick={onStart}
           disabled={starting}
-          className="w-full h-14 rounded-xl bg-primary text-white text-lg font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-60"
+          className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-60"
         >
           {starting ? <Loader2 className="h-5 w-5 animate-spin" /> : "▶  Start Route"}
         </button>
@@ -140,7 +140,7 @@ function RouteInProgressState({
         <h2 className="text-xl font-bold">All stops done!</h2>
         <a
           href={`/driver/done?routeId=${route.id}`}
-          className="h-14 px-8 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center"
+          className="h-14 px-8 rounded-full bg-primary text-primary-foreground font-bold text-lg flex items-center justify-center"
         >
           View Summary
         </a>
@@ -211,7 +211,7 @@ function RouteInProgressState({
               onClick={() => onArrive(currentStop.id)}
               disabled={arriving}
               className={cn(
-                "flex-1 h-12 rounded-xl bg-primary text-white font-bold text-base flex items-center justify-center gap-2",
+                "flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2",
                 "active:scale-[0.98] transition-transform disabled:opacity-60",
                 mapsUrl ? "" : "w-full"
               )}

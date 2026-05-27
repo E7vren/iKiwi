@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
@@ -25,7 +25,7 @@ export default function AdminMapPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem-3rem)]">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Delivery Map</h1>
+        <h1 className="text-headline-lg">Delivery Map</h1>
         <p className="text-sm text-muted-foreground">
           {shops.filter((s) => s.isActive).length} active ·{" "}
           {shops.filter((s) => !s.isActive).length} pending

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Bell, ClipboardList, Home, ShoppingCart, User } from "lucide-react";
@@ -56,7 +56,7 @@ export function BottomNav() {
           className="fixed z-50 md:hidden"
           style={{ bottom: "calc(64px + env(safe-area-inset-bottom) + 12px)", right: "16px" }}
         >
-          <div className="flex items-center gap-2 bg-primary text-white rounded-2xl px-4 py-2.5 shadow-lg"
+          <div className="flex items-center gap-2 bg-primary text-primary-foreground rounded-2xl px-4 py-2.5 shadow-lg"
             style={{ boxShadow: "0 4px 16px rgba(152,214,45,0.45)" }}>
             <ShoppingCart className="h-5 w-5 shrink-0" />
             <div className="leading-tight">

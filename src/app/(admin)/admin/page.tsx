@@ -115,7 +115,7 @@ export default function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-headline-lg">Dashboard</h1>
         <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           {(["a", "b", "c", "d"] as const).map((k) => (
             <Skeleton key={k} className="h-28 rounded-xl" />
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-headline-lg">Dashboard</h1>
         <Button variant="outline" size="sm" onClick={() => router.push("/admin/orders")}>
           All Orders <ArrowRight className="h-4 w-4 ml-1.5" />
         </Button>

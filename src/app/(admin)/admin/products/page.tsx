@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -720,7 +720,7 @@ function ProductsContent() {
               onClick={() => { setAvailFilter(v); setPage(1); }}
               className={`px-3 py-1.5 transition-colors ${
                 availFilter === v
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-gray-50"
               }`}
             >
@@ -966,7 +966,7 @@ function CombinedContent() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-1">
         <div>
-          <h1 className="text-2xl font-bold">Products &amp; Prices</h1>
+          <h1 className="text-headline-lg">Products &amp; Prices</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Manage your catalog and set today&apos;s prices
           </p>

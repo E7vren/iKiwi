@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Fuse from "fuse.js";
 import { AnimatePresence, motion } from "framer-motion";
@@ -225,7 +225,7 @@ function CategoryChips({ categories, active, onSelect, locale }: {
             onClick={() => onSelect(c.id)}
             className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 ${
               isActive
-                ? "bg-primary text-white shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-card border border-border text-foreground hover:border-primary/40"
             }`}
           >

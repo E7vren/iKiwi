@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -690,7 +690,7 @@ export default function AdminStaffPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Delivery Staff</h1>
+          <h1 className="text-headline-lg">Delivery Staff</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {staff.length} drivers · {staff.filter((s) => s.isActive).length} active
           </p>
@@ -719,7 +719,7 @@ export default function AdminStaffPage() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${loading ? "text-muted-foreground" : ""}`}>
+                <div className={`text-data-display ${loading ? "text-muted-foreground" : ""}`}>
                   {loading ? "…" : value}
                 </div>
               </CardContent>

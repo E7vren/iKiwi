@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, ExternalLink, Loader2, MapPin, Pencil, Phone, Search, User, XCircle } from "lucide-react";
@@ -138,7 +138,7 @@ export default function AdminShopsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Shops</h1>
+          <h1 className="text-headline-lg">Shops</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {shops.length} shops ·{" "}
             {pending > 0 && (
@@ -167,7 +167,7 @@ export default function AdminShopsPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-white border border-gray-200 text-muted-foreground hover:border-primary/40"
               }`}
             >

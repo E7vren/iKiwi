@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -735,7 +735,7 @@ export default function RestockPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Restock Tasks</h1>
+        <h1 className="text-headline-lg">Restock Tasks</h1>
         <div className="space-y-3">
           {[1, 2, 3].map((k) => (
             <Skeleton key={k} className="h-24 rounded-xl" />
@@ -748,7 +748,7 @@ export default function RestockPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold">Restock Tasks</h1>
+        <h1 className="text-headline-lg">Restock Tasks</h1>
         <div className="flex gap-2">
           <Button
             variant="outline"

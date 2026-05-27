@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
@@ -151,7 +151,7 @@ export default function StockHistoryPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Stock History</h1>
+        <h1 className="text-headline-lg">Stock History</h1>
         <Skeleton className="h-12 rounded-xl" />
         <Skeleton className="h-96 rounded-xl" />
       </div>
@@ -161,7 +161,7 @@ export default function StockHistoryPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Stock History</h1>
+        <h1 className="text-headline-lg">Stock History</h1>
         <Button
           variant="outline"
           size="sm"

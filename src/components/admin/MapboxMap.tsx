@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Navigation, Search, X } from "lucide-react";
 import type mapboxgl from "mapbox-gl";
@@ -209,7 +209,7 @@ export function MapboxMap({ shops }: Props) {
           onClick={() => setSidebarOpen(true)}
         >
           <Search className="h-3.5 w-3.5" /> Shops
-          <Badge className="bg-primary text-white text-[10px] ml-0.5">{shops.length}</Badge>
+          <Badge className="bg-primary text-primary-foreground text-[10px] ml-0.5">{shops.length}</Badge>
         </button>
       )}
 

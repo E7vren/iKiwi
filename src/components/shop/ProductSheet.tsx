@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AlertTriangle, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -105,7 +105,7 @@ export function ProductSheet({ product, onClose }: Props) {
                     type="button"
                     className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                       orderedAs === "KG"
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setOrderedAs("KG")}
@@ -116,7 +116,7 @@ export function ProductSheet({ product, onClose }: Props) {
                     type="button"
                     className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                       orderedAs === "PIECE"
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setOrderedAs("PIECE")}
