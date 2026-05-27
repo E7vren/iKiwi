@@ -19,13 +19,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getPusherClient } from "@/lib/pusherClient";
 import { cn } from "@/lib/utils";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 
-const NAV = [
-  { href: "/warehouse", label: "My Tasks", icon: ClipboardList, exact: true },
-  { href: "/warehouse/stock", label: "Stock", icon: Archive },
-  { href: "/warehouse/tomorrow", label: "Tomorrow", icon: CalendarDays, exact: false },
-  { href: "/warehouse/profile", label: "Profile", icon: User },
-];
 
 function getInitials(name: string) {
   return name
@@ -48,6 +44,15 @@ export function WarehouseShell({
   userEmail: string;
 }) {
   const pathname = usePathname();
+  const locale   = useLocaleStore((s) => s.locale);
+  const T        = useTranslations(locale);
+
+  const NAV = [
+    { href: "/warehouse",          label: T.navMyTasks,  icon: ClipboardList, exact: true  },
+    { href: "/warehouse/stock",    label: T.navStock,    icon: Archive,       exact: false },
+    { href: "/warehouse/tomorrow", label: T.navTomorrow, icon: CalendarDays,  exact: false },
+    { href: "/warehouse/profile",  label: T.navProfile,  icon: User,          exact: false },
+  ];
 
   // Pusher: subscribe to private-warehouse-{staffId}
   useEffect(() => {
@@ -74,9 +79,9 @@ export function WarehouseShell({
   }, [staffId]);
 
   return (
-    <div className="flex flex-col min-h-dvh bg-gray-50 force-light">
+    <div className="flex flex-col min-h-dvh bg-background">
       {/* ─── Top bar ─────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 flex items-center justify-between bg-white border-b px-4 h-14 shrink-0 shadow-sm">
+      <header className="sticky top-0 z-20 flex items-center justify-between bg-card border-b px-4 h-14 shrink-0 shadow-sm">
         <div className="flex items-center gap-2">
           <Logo size={28} />
           <span className="text-xs font-semibold text-muted-foreground -ml-1">Warehouse</span>
@@ -105,7 +110,7 @@ export function WarehouseShell({
                 onSelect={() => signOut({ callbackUrl: "/login" })}
               >
                 <LogOut className="h-4 w-4" />
-                Sign Out
+                {T.navSignOut}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -116,7 +121,7 @@ export function WarehouseShell({
       <main className="flex-1 overflow-y-auto pb-20">{children}</main>
 
       {/* ─── Bottom nav ──────────────────────────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-20 border-t bg-white">
+      <nav className="fixed bottom-0 left-0 right-0 z-20 border-t bg-card">
         <div className="flex">
           {NAV.map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href);

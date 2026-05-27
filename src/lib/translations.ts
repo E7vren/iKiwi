@@ -77,6 +77,16 @@ const translations = {
     staffNote:   "Xodim izohi",
     finalTotal:  "Yakuniy jami",
     adjustedLabel: "tuzatildi",
+    // Driver / Warehouse nav
+    navRoutes:    "Marshrutlar",
+    navShopping:  "Xarid",
+    navProfile:   "Profil",
+    navOnline:    "Online",
+    navOffline:   "Offline",
+    navMyTasks:   "Vazifalar",
+    navStock:     "Ombor",
+    navTomorrow:  "Ertaga",
+    navSignOut:   "Chiqish",
     // Qty note
     qtyNote:     "Og'irlik o'lchanganidan so'ng miqdor o'zgarishi mumkin. To'lov narxi haqida xabar beriladi.",
     // Profile / Settings
@@ -208,6 +218,16 @@ const translations = {
     staffNote:   "Staff note",
     finalTotal:  "Final total",
     adjustedLabel: "adjusted",
+    // Driver / Warehouse nav
+    navRoutes:    "Routes",
+    navShopping:  "Shopping",
+    navProfile:   "Profile",
+    navOnline:    "Online",
+    navOffline:   "Offline",
+    navMyTasks:   "My Tasks",
+    navStock:     "Stock",
+    navTomorrow:  "Tomorrow",
+    navSignOut:   "Sign Out",
     // Qty note
     qtyNote:     "Quantity may be adjusted after weighing. You'll be notified of the final cost.",
     // Profile / Settings
@@ -339,6 +359,16 @@ const translations = {
     staffNote:   "Примечание персонала",
     finalTotal:  "Итого",
     adjustedLabel: "скорректировано",
+    // Driver / Warehouse nav
+    navRoutes:    "Маршруты",
+    navShopping:  "Покупки",
+    navProfile:   "Профиль",
+    navOnline:    "Online",
+    navOffline:   "Offline",
+    navMyTasks:   "Задачи",
+    navStock:     "Склад",
+    navTomorrow:  "Завтра",
+    navSignOut:   "Выйти",
     // Qty note
     qtyNote:     "Количество может быть скорректировано после взвешивания. Вы получите уведомление о финальной стоимости.",
     // Profile / Settings

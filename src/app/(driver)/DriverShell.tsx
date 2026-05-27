@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { ThemeToggleIcon } from "@/components/shared/ThemeToggle";
 import { getPusherClient } from "@/lib/pusherClient";
 import { toggleStaffAvailability, updateMyLocation } from "@/server/actions/delivery-staff";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 
 interface DriverCtxValue {
   isOnline:     boolean;
@@ -26,11 +28,6 @@ export function useDriverCtx() {
   return useContext(DriverCtx);
 }
 
-const NAV = [
-  { href: "/driver",          label: "Routes",   icon: Truck,         exact: true  },
-  { href: "/driver/shopping", label: "Shopping", icon: ShoppingCart,  exact: false },
-  { href: "/driver/profile",  label: "Profile",  icon: User,          exact: false },
-];
 
 export function DriverShell({
   children,
@@ -44,6 +41,14 @@ export function DriverShell({
   staffId:       string;
 }) {
   const pathname        = usePathname();
+  const locale          = useLocaleStore((s) => s.locale);
+  const T               = useTranslations(locale);
+
+  const NAV = [
+    { href: "/driver",          label: T.navRoutes,   icon: Truck,        exact: true  },
+    { href: "/driver/shopping", label: T.navShopping, icon: ShoppingCart, exact: false },
+    { href: "/driver/profile",  label: T.navProfile,  icon: User,         exact: false },
+  ];
   const [isOnline,      setIsOnline]      = useState(initialOnline);
   const [toggling,      setToggling]      = useState(false);
   const [shopBadge,     setShopBadge]     = useState(0);
@@ -126,7 +131,7 @@ export function DriverShell({
           <div className="flex items-center gap-1.5">
             <ThemeToggleIcon />
             <span className={cn("text-sm font-semibold transition-colors", isOnline ? "text-green-600" : "text-gray-400")}>
-              {isOnline ? "Online" : "Offline"}
+              {isOnline ? T.navOnline : T.navOffline}
             </span>
             <button
               role="switch"

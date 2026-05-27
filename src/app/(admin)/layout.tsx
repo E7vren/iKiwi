@@ -10,10 +10,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (session.user.role !== "COMPANY_ADMIN") redirect("/");
 
   return (
-    <div className="force-light flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-end gap-1 border-b bg-white px-6 shadow-sm">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-end gap-1 border-b bg-card px-6 shadow-sm">
           <ThemeToggleIcon />
           <NotifBell />
         </header>

@@ -60,7 +60,7 @@ function NavLink({ href, label, icon: Icon, exact }: (typeof links)[0]) {
         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
         active
           ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-gray-100 hover:text-gray-900"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -73,7 +73,7 @@ export function Sidebar() {
   const { data: session } = useSession();
 
   return (
-    <aside className="hidden md:flex flex-col w-60 shrink-0 border-r bg-white h-screen sticky top-0">
+    <aside className="hidden md:flex flex-col w-60 shrink-0 border-r bg-card h-screen sticky top-0">
       <div className="px-5 py-4 border-b">
         <Logo size={32} />
         <p className="text-xs text-muted-foreground mt-0.5 ml-0.5">Admin Panel</p>
@@ -125,7 +125,7 @@ export function AdminBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-white">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-card">
       <div className="flex overflow-x-auto">
         {[...links, ...warehouseLinks].map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
