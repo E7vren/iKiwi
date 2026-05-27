@@ -246,7 +246,7 @@ function AddStaffDialog({
                   className={`flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer transition-colors ${
                     vehicleType === v
                       ? "border-primary bg-primary/5"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-border hover:border-gray-300"
                   }`}
                 >
                   <input
@@ -556,7 +556,7 @@ function StaffDetailSheet({
                   { label: "On-time rate", value: `${details.stats.onTimeRate}%`, unit: "" },
                   { label: "Return rate", value: `${details.stats.returnRate}%`, unit: "" },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-lg border bg-white p-3 text-center">
+                  <div key={s.label} className="rounded-lg border bg-card p-3 text-center">
                     <p className="text-lg font-bold text-gray-900">{s.value}</p>
                     <p className="text-[10px] text-muted-foreground leading-tight">{s.label}</p>
                     {s.unit && <p className="text-[10px] text-muted-foreground">{s.unit}</p>}
@@ -577,7 +577,7 @@ function StaffDetailSheet({
                   {details.recentRoutes.map((r) => {
                     const badge = ROUTE_STATUS[r.status] ?? { label: r.status, cls: "bg-gray-100 text-gray-600" };
                     return (
-                      <div key={r.id} className="flex items-center justify-between rounded-lg border px-3 py-2.5 bg-white text-sm">
+                      <div key={r.id} className="flex items-center justify-between rounded-lg border px-3 py-2.5 bg-card text-sm">
                         <div>
                           <p className="font-medium">{format(new Date(r.date), "EEE, MMM d")}</p>
                           <p className="text-xs text-muted-foreground">
@@ -729,7 +729,7 @@ export default function AdminStaffPage() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+      <div className="rounded-xl bg-card border border-border shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-3">
             {[1, 2, 3].map((k) => <Skeleton key={k} className="h-14 w-full" />)}
@@ -746,26 +746,26 @@ export default function AdminStaffPage() {
               <TableRow>
                 <TableHead className="w-10" />
                 <TableHead
-                  className="cursor-pointer select-none hover:bg-gray-50"
+                  className="cursor-pointer select-none hover:bg-muted/40"
                   onClick={() => toggleSort("fullName")}
                 >
                   Name <SortIcon col="fullName" sort={sort} />
                 </TableHead>
                 <TableHead className="hidden sm:table-cell">Phone</TableHead>
                 <TableHead
-                  className="cursor-pointer select-none hover:bg-gray-50 hidden md:table-cell"
+                  className="cursor-pointer select-none hover:bg-muted/40 hidden md:table-cell"
                   onClick={() => toggleSort("vehicleType")}
                 >
                   Vehicle <SortIcon col="vehicleType" sort={sort} />
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none hover:bg-gray-50"
+                  className="cursor-pointer select-none hover:bg-muted/40"
                   onClick={() => toggleSort("status")}
                 >
                   Status <SortIcon col="status" sort={sort} />
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none hover:bg-gray-50 hidden lg:table-cell"
+                  className="cursor-pointer select-none hover:bg-muted/40 hidden lg:table-cell"
                   onClick={() => toggleSort("today")}
                 >
                   Today <SortIcon col="today" sort={sort} />
@@ -780,7 +780,7 @@ export default function AdminStaffPage() {
                 return (
                   <TableRow
                     key={s.id}
-                    className="cursor-pointer hover:bg-gray-50/80"
+                    className="cursor-pointer hover:bg-muted/40/80"
                     onClick={() => setSelectedId(s.id)}
                   >
                     {/* Avatar */}

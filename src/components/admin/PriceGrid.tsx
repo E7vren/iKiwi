@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -193,7 +193,7 @@ export function PriceGrid() {
               </div>
 
               {/* Products table */}
-              <div className="rounded-xl border bg-white overflow-hidden">
+              <div className="rounded-xl border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-gray-50">
@@ -205,7 +205,7 @@ export function PriceGrid() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {items.map(({ product, idx }) => (
-                      <tr key={product.id} className="hover:bg-gray-50/50">
+                      <tr key={product.id} className="hover:bg-muted/40/50">
                         <td className="px-4 py-2.5">
                           <input type="hidden" {...register(`prices.${idx}.productId`)} />
                           <input type="hidden" {...register(`prices.${idx}.unitType`)} />

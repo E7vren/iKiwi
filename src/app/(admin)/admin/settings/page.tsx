@@ -35,7 +35,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Account */}
-      <div className="rounded-xl bg-white border shadow-sm p-6 space-y-4">
+      <div className="rounded-xl bg-card border shadow-sm p-6 space-y-4">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           Account
         </h2>
@@ -68,7 +68,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Language */}
-      <div className="rounded-xl bg-white border shadow-sm p-6 space-y-4">
+      <div className="rounded-xl bg-card border shadow-sm p-6 space-y-4">
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Language
@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
               className={`flex flex-col items-center gap-1.5 rounded-xl border-2 py-4 px-3 transition-all ${
                 locale === lang.value
                   ? "border-primary bg-primary/5"
-                  : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                  : "border-border hover:border-border hover:bg-muted/40"
               }`}
             >
               <span className="text-3xl">{lang.flag}</span>
@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Theme */}
-      <div className="rounded-xl bg-white border shadow-sm p-6 space-y-4">
+      <div className="rounded-xl bg-card border shadow-sm p-6 space-y-4">
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Appearance
@@ -119,7 +119,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* About */}
-      <div className="rounded-xl bg-white border shadow-sm p-6 space-y-3">
+      <div className="rounded-xl bg-card border shadow-sm p-6 space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           About
         </h2>

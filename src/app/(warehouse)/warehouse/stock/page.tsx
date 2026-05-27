@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -417,7 +417,7 @@ export default function WarehouseStockPage() {
   return (
     <div className="space-y-0">
       {/* Search bar + controls */}
-      <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-10 bg-card border-b px-4 py-3 shadow-sm">
         <div className="relative">
           <Search className="absolute left-3.5 top-3 h-5 w-5 text-muted-foreground" />
           <input
@@ -426,7 +426,7 @@ export default function WarehouseStockPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products…"
-            className="h-11 w-full rounded-xl border-2 border-gray-200 bg-gray-50 pl-10 pr-10 text-base focus:border-primary focus:outline-none"
+            className="h-11 w-full rounded-xl border-2 border-border bg-gray-50 pl-10 pr-10 text-base focus:border-primary focus:outline-none"
           />
           {search && (
             <button
@@ -489,7 +489,7 @@ export default function WarehouseStockPage() {
                   {cat}
                 </p>
               </div>
-              <div className="bg-white">
+              <div className="bg-card">
                 {rows.map((row) => (
                   <StockItem
                     key={row.id}

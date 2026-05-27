@@ -256,7 +256,7 @@ export default function StockHistoryPage() {
                 const color  = deltaColor(m.type, kg, pieces);
 
                 return (
-                  <tr key={m.id} className="hover:bg-gray-50/50 transition-colors">
+                  <tr key={m.id} className="hover:bg-muted/40/50 transition-colors">
                     <td className="px-5 py-3 whitespace-nowrap">
                       <p className="font-medium tabular-nums">
                         {format(new Date(m.createdAt), "dd MMM HH:mm")}

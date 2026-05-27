@@ -275,7 +275,7 @@ function AdjustDialog({ row, onClose }: { row: StockRow; onClose: () => void }) 
               {(Object.keys(adjustTypeLabels) as AdjustType[]).map((t) => (
                 <button key={t} type="button" onClick={() => setType(t)}
                   className={`rounded-lg border px-3 py-2 text-xs font-medium text-left transition-colors ${
-                    type === t ? "border-primary bg-primary/5 text-primary" : "border-gray-200 hover:border-gray-300"
+                    type === t ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-gray-300"
                   }`}>
                   {adjustTypeLabels[t]}
                 </button>
@@ -732,7 +732,7 @@ export default function WarehousePage() {
                 </tr>
               )}
               {rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={row.id} className="hover:bg-muted/40/50 transition-colors">
                   <td className="px-5 py-3 font-medium">{row.product.name}</td>
                   <td className="px-3 py-3 text-muted-foreground text-xs">
                     {row.product.category?.nameEn ?? "—"}

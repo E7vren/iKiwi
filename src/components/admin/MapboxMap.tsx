@@ -126,10 +126,10 @@ export function MapboxMap({ shops }: Props) {
   }
 
   return (
-    <div className="flex h-full relative rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+    <div className="flex h-full relative rounded-xl overflow-hidden border border-border shadow-sm">
       {/* Sidebar */}
       <div
-        className={`absolute left-0 top-0 bottom-0 z-10 bg-white border-r flex flex-col transition-all duration-200 ${
+        className={`absolute left-0 top-0 bottom-0 z-10 bg-card border-r flex flex-col transition-all duration-200 ${
           sidebarOpen ? "w-64" : "w-0"
         } overflow-hidden`}
       >
@@ -161,7 +161,7 @@ export function MapboxMap({ shops }: Props) {
             <button
               key={shop.id}
               type="button"
-              className={`w-full text-left p-3 border-b hover:bg-gray-50 transition-colors ${
+              className={`w-full text-left p-3 border-b hover:bg-muted/40 transition-colors ${
                 selectedShop?.id === shop.id ? "bg-primary/5 border-l-2 border-l-primary" : ""
               }`}
               onClick={() => setSelectedShop(shop)}
@@ -182,13 +182,13 @@ export function MapboxMap({ shops }: Props) {
         {/* Stats overlay */}
         <div className="p-3 border-t bg-gray-50">
           <div className="grid grid-cols-2 gap-2 text-center">
-            <div className="bg-white rounded-lg p-2 shadow-sm">
+            <div className="bg-card rounded-lg p-2 shadow-sm">
               <p className="text-lg font-bold text-primary">
                 {shops.filter((s) => s.isActive).length}
               </p>
               <p className="text-[10px] text-muted-foreground">Active</p>
             </div>
-            <div className="bg-white rounded-lg p-2 shadow-sm">
+            <div className="bg-card rounded-lg p-2 shadow-sm">
               <p className="text-lg font-bold text-amber-500">
                 {shops.filter((s) => !s.isActive).length}
               </p>
@@ -205,7 +205,7 @@ export function MapboxMap({ shops }: Props) {
       {!sidebarOpen && (
         <button
           type="button"
-          className="absolute left-3 top-3 z-10 bg-white rounded-lg shadow-md px-3 py-2 text-xs font-medium flex items-center gap-1.5 hover:bg-gray-50 border"
+          className="absolute left-3 top-3 z-10 bg-card rounded-lg shadow-md px-3 py-2 text-xs font-medium flex items-center gap-1.5 hover:bg-muted/40 border"
           onClick={() => setSidebarOpen(true)}
         >
           <Search className="h-3.5 w-3.5" /> Shops

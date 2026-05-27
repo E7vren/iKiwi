@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -93,7 +93,7 @@ function NumInput({
         <button
           type="button"
           onClick={dec}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-gray-200 bg-white active:bg-gray-100 transition-colors"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-border bg-card active:bg-muted transition-colors"
         >
           <Minus className="h-5 w-5 text-gray-600" />
         </button>
@@ -103,7 +103,7 @@ function NumInput({
             inputMode="decimal"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="h-12 w-full rounded-xl border-2 border-gray-200 bg-white px-3 text-center text-lg font-semibold focus:border-primary focus:outline-none"
+            className="h-12 w-full rounded-xl border-2 border-border bg-card px-3 text-center text-lg font-semibold focus:border-primary focus:outline-none"
           />
           {suffix && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
@@ -114,7 +114,7 @@ function NumInput({
         <button
           type="button"
           onClick={inc}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-gray-200 bg-white active:bg-gray-100 transition-colors"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-border bg-card active:bg-muted transition-colors"
         >
           <Plus className="h-5 w-5 text-gray-600" />
         </button>
@@ -201,7 +201,7 @@ function CompleteScreen({ task, onBack, onDone }: { task: Task; onBack: () => vo
   return (
     <div className="flex flex-col min-h-dvh bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b px-4 py-3 shadow-sm">
+      <header className="sticky top-0 z-10 bg-card border-b px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -307,7 +307,7 @@ function CompleteScreen({ task, onBack, onDone }: { task: Task; onBack: () => vo
       </div>
 
       {/* Sticky bottom summary + confirm */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg px-4 pt-3 pb-6 space-y-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-lg px-4 pt-3 pb-6 space-y-3">
         <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-1">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Total cost paid</span>

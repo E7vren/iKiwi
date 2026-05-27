@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -388,7 +388,7 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
           </div>
 
           {/* ── Summary + note + actions (sticky bottom) ── */}
-          <div className="shrink-0 border-t bg-white px-6 pt-4 pb-6 space-y-4">
+          <div className="shrink-0 border-t bg-card px-6 pt-4 pb-6 space-y-4">
             {/* Summary block */}
             <div className="rounded-xl border bg-gray-50 p-4 space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
@@ -734,7 +734,7 @@ export function OrderTable() {
         </Button>
       </div>
 
-      <div className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+      <div className="rounded-xl bg-card border border-border shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-6 space-y-3">
             {(["a", "b", "c", "d"] as const).map((k) => (

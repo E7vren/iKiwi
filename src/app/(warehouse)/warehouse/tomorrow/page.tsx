@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -48,7 +48,7 @@ export default function TomorrowOrdersPage() {
       </p>
 
       {orders.map((order: Order) => (
-        <div key={order.id} className="rounded-xl border bg-white shadow-sm overflow-hidden">
+        <div key={order.id} className="rounded-xl border bg-card shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
             <div>
               <p className="font-semibold text-sm">{order.shop.name}</p>

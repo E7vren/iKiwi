@@ -135,8 +135,8 @@ function RouteCard({
 
   return (
     <div
-      className={`rounded-xl bg-white shadow-sm overflow-hidden transition-all ${
-        isSelected ? "ring-2 ring-offset-1" : "border border-gray-100"
+      className={`rounded-xl bg-card shadow-sm overflow-hidden transition-all ${
+        isSelected ? "ring-2 ring-offset-1" : "border border-border"
       }`}
       style={isSelected ? { outlineColor: color } : {}}
     >
@@ -414,7 +414,7 @@ export default function AdminRoutesPage() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="h-9 rounded-lg border border-gray-200 px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="h-9 rounded-lg border border-border px-3 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <Button
             size="sm"
@@ -474,11 +474,11 @@ export default function AdminRoutesPage() {
       </div>
 
       {/* Map toggle */}
-      <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         <div
           role="button"
           tabIndex={0}
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition-colors cursor-pointer"
           onClick={() => setMapOpen((o) => !o)}
           onKeyDown={(e) => e.key === "Enter" && setMapOpen((o) => !o)}
         >
@@ -545,7 +545,7 @@ export default function AdminRoutesPage() {
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : !data?.routes.length ? (
-        <div className="rounded-xl border border-dashed bg-white py-16 text-center">
+        <div className="rounded-xl border border-dashed bg-card py-16 text-center">
           <Truck className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
           <p className="font-medium text-gray-700">No routes for this date</p>
           <p className="text-sm text-muted-foreground mt-1">
@@ -626,7 +626,7 @@ export default function AdminRoutesPage() {
                     className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                       optMode === mode
                         ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-white border-gray-200 text-muted-foreground hover:border-primary/40"
+                        : "bg-card border-border text-muted-foreground hover:border-primary/40"
                     }`}
                   >
                     {mode === "DISTANCE" ? "🛣️ Distance" : mode === "TIME" ? "⏱️ Time" : "⚖️ Balanced"}
@@ -659,7 +659,7 @@ export default function AdminRoutesPage() {
                   return (
                     <label
                       key={order.id}
-                      className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-gray-50"
+                      className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/40"
                     >
                       <input
                         type="checkbox"

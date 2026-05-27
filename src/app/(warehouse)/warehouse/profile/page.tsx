@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -99,7 +99,7 @@ export default function WarehouseProfilePage() {
         <button
           type="button"
           onClick={() => { window.location.href = "tel:+998712345678"; }}
-          className="flex w-full items-center gap-4 border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          className="flex w-full items-center gap-4 border-b px-4 py-4 text-left hover:bg-muted/40 active:bg-muted transition-colors"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-green-600 bg-green-50">
             <Phone className="h-5 w-5" />

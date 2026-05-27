@@ -164,7 +164,7 @@ function AssignDialog({
                   className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                     priority === p
                       ? "border-primary bg-primary/5 text-primary"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-border hover:border-gray-300"
                   }`}
                 >
                   {p}
@@ -462,7 +462,7 @@ function CreateDialog({
                       className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                         priority === p
                           ? "border-primary bg-primary/5 text-primary"
-                          : "border-gray-200 hover:border-gray-300"
+                          : "border-border hover:border-gray-300"
                       }`}
                     >
                       {p}
@@ -858,7 +858,7 @@ export default function RestockPage() {
           </SheetHeader>
           <div className="space-y-3">
             {(shoppingItems ?? []).map((item) => (
-              <div key={item.productId} className="rounded-xl border bg-white p-3 space-y-1.5">
+              <div key={item.productId} className="rounded-xl border bg-card p-3 space-y-1.5">
                 <p className="font-semibold text-sm">{item.productName}</p>
                 <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
                   <div>

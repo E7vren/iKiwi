@@ -508,7 +508,7 @@ function BulkImportDialog({ onSuccess }: { onSuccess: () => void }) {
                   <label
                     key={opt.value}
                     className={`flex items-start gap-2.5 cursor-pointer rounded-lg border p-3 transition-colors ${
-                      mode === opt.value ? "border-primary bg-primary/5" : "hover:bg-gray-50"
+                      mode === opt.value ? "border-primary bg-primary/5" : "hover:bg-muted/40"
                     }`}
                   >
                     <input
@@ -712,7 +712,7 @@ function ProductsContent() {
           </SelectContent>
         </Select>
         {/* Availability filter */}
-        <div className="flex rounded-lg border bg-white overflow-hidden text-sm">
+        <div className="flex rounded-lg border bg-card overflow-hidden text-sm">
           {(["ALL", "AVAILABLE", "UNAVAILABLE"] as const).map((v) => (
             <button
               key={v}
@@ -721,7 +721,7 @@ function ProductsContent() {
               className={`px-3 py-1.5 transition-colors ${
                 availFilter === v
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-50"
+                  : "text-muted-foreground hover:bg-muted/40"
               }`}
             >
               {v === "ALL" ? "All" : v === "AVAILABLE" ? "Active" : "Hidden"}
@@ -738,7 +738,7 @@ function ProductsContent() {
           ))}
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 rounded-xl border bg-white text-center">
+        <div className="flex flex-col items-center justify-center py-24 rounded-xl border bg-card text-center">
           <Package className="h-12 w-12 text-gray-300 mb-4" />
           <p className="font-semibold text-gray-700">No products found</p>
           {search || catFilter !== "ALL" || availFilter !== "ALL" ? (
@@ -763,7 +763,7 @@ function ProductsContent() {
           )}
         </div>
       ) : (
-        <div className="rounded-xl border bg-white overflow-hidden">
+        <div className="rounded-xl border bg-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

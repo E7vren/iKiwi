@@ -168,7 +168,7 @@ export default function AdminShopsPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f
                   ? "bg-primary text-primary-foreground"
-                  : "bg-white border border-gray-200 text-muted-foreground hover:border-primary/40"
+                  : "bg-card border border-border text-muted-foreground hover:border-primary/40"
               }`}
             >
               {f === "ALL"
@@ -182,7 +182,7 @@ export default function AdminShopsPage() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+      <div className="rounded-xl bg-card border border-border shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-6 space-y-3">
             {(["a", "b", "c", "d"] as const).map((k) => (

@@ -231,7 +231,7 @@ export default function CategoriesPage() {
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center rounded-xl border bg-white">
+        <div className="flex flex-col items-center justify-center py-24 text-center rounded-xl border bg-card">
           <div className="text-5xl mb-4">🏷️</div>
           <p className="text-lg font-semibold text-gray-800">No categories yet</p>
           <p className="text-sm text-muted-foreground mt-1 mb-6">
@@ -242,7 +242,7 @@ export default function CategoriesPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-xl border bg-white overflow-hidden">
+        <div className="rounded-xl border bg-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
