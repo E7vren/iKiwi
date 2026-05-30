@@ -36,6 +36,7 @@ export async function getMyShops() {
     latitude: Number(s.latitude),
     longitude: Number(s.longitude),
     isActive: s.isActive,
+    paymentMethod: s.paymentMethod as "CASH" | "CARD",
     createdAt: s.createdAt.toISOString(),
   }));
 }
@@ -128,6 +129,24 @@ export async function updateMyShop(input: UpdateMyShopInput): Promise<Result<voi
     data: { name, ownerName, phone, address, latitude, longitude },
   });
 
+  revalidatePath("/shop/profile");
+  return { success: true, data: undefined };
+}
+
+// ─── Shop owner: update payment method ───────────────────────────────────────
+
+export async function updatePaymentMethod(
+  shopId: string,
+  method: "CASH" | "CARD"
+): Promise<Result<void>> {
+  const user = await requireShopOwner();
+  if (!user) return { success: false, error: "Forbidden" };
+
+  const existing = await prisma.shop.findFirst({ where: { id: shopId, userId: user.id } });
+  if (!existing) return { success: false, error: "Shop not found" };
+
+  await prisma.shop.update({ where: { id: shopId }, data: { paymentMethod: method } });
+  revalidatePath("/shop/payment");
   revalidatePath("/shop/profile");
   return { success: true, data: undefined };
 }

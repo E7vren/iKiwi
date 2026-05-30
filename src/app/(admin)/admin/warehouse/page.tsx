@@ -485,7 +485,7 @@ function StockDetailSheet({ row, onClose }: { row: StockRow; onClose: () => void
                   )}
                 </div>
                 {kgPct !== null && (
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${kgPct < 100 ? "bg-amber-400" : "bg-green-500"}`}
                       style={{ width: `${kgPct}%` }}
@@ -509,7 +509,7 @@ function StockDetailSheet({ row, onClose }: { row: StockRow; onClose: () => void
                   )}
                 </div>
                 {piecePct !== null && (
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${piecePct < 100 ? "bg-amber-400" : "bg-green-500"}`}
                       style={{ width: `${piecePct}%` }}
@@ -696,7 +696,7 @@ export default function WarehousePage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50/50 text-xs text-muted-foreground">
+              <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
                 <th className="text-left px-5 py-2.5 font-medium">
                   <button type="button" className="flex items-center gap-1" onClick={() => toggleSort("name")}>
                     Product <ArrowUpDown className="h-3 w-3" />

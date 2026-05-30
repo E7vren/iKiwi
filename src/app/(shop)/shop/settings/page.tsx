@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  ArrowLeft, Bell, ChevronRight, Database, Globe,
-  ImageIcon, Info, Key, Lock, Mail, Monitor, Phone,
-  Star, Trash2, Type,
+  ArrowLeft, Bell, ChevronRight, Database, Eye, EyeOff, Globe,
+  ImageIcon, Info, Key, Lock, Loader2, Mail, Monitor,
+  Phone, Trash2, Type,
 } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -27,6 +27,8 @@ import {
   type ImageQuality,
   type TextSize,
 } from "@/store/settingsStore";
+import { changeEmail, changePassword, changePhone } from "@/server/actions/account";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // ─── Custom toggle ─────────────────────────────────────────────────────────────
 
@@ -182,6 +184,126 @@ function PickerSheet<T extends string>({
   );
 }
 
+// ─── Account change dialogs ───────────────────────────────────────────────────
+
+function PasswordField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <Input type={show ? "text" : "password"} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+      <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
+function ChangePasswordDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [current, setCurrent] = useState("");
+  const [next, setNext]       = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy]       = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (next !== confirm) { toast.error("Passwords do not match"); return; }
+    setBusy(true);
+    const res = await changePassword({ currentPassword: current, newPassword: next });
+    setBusy(false);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success("Password updated");
+    setCurrent(""); setNext(""); setConfirm("");
+    onClose();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader><DialogTitle>Change Password</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div className="space-y-1.5"><label className="text-sm font-medium">Current Password</label><PasswordField value={current} onChange={setCurrent} /></div>
+          <div className="space-y-1.5"><label className="text-sm font-medium">New Password</label><PasswordField value={next} onChange={setNext} placeholder="Min 8 characters" /></div>
+          <div className="space-y-1.5"><label className="text-sm font-medium">Confirm New Password</label><PasswordField value={confirm} onChange={setConfirm} /></div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy || !current || next.length < 8 || next !== confirm}>
+              {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Update
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ChangeEmailDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [email, setEmail]       = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy]         = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const res = await changeEmail({ newEmail: email, currentPassword: password });
+    setBusy(false);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success("Email updated — please log in again");
+    setEmail(""); setPassword("");
+    onClose();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader><DialogTitle>Change Email</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div className="space-y-1.5"><label className="text-sm font-medium">New Email Address</label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div>
+          <div className="space-y-1.5"><label className="text-sm font-medium">Confirm with Password</label><PasswordField value={password} onChange={setPassword} /></div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy || !email || !password}>
+              {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Update
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ChangePhoneDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy]   = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const res = await changePhone({ newPhone: phone });
+    setBusy(false);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success("Phone number updated");
+    setPhone("");
+    onClose();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader><DialogTitle>Change Phone</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div className="space-y-1.5"><label className="text-sm font-medium">New Phone Number</label><Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+998901234567" /></div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy || phone.length < 7}>
+              {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Update
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -204,6 +326,9 @@ export default function SettingsPage() {
   const [cacheOpen,   setCacheOpen]   = useState(false);
   const [deleteOpen,  setDeleteOpen]  = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+  const [pwOpen,      setPwOpen]      = useState(false);
+  const [emailOpen,   setEmailOpen]   = useState(false);
+  const [phoneOpen,   setPhoneOpen]   = useState(false);
 
   const sizeLabel:    Record<TextSize, string>     = { small: T.sizeSmall, medium: T.sizeMedium, large: T.sizeLarge };
   const qualityLabel: Record<ImageQuality, string> = { high: T.qualityHigh, medium: T.qualityMedium, low: T.qualityLow };
@@ -238,9 +363,9 @@ export default function SettingsPage() {
       {/* 1 ── Account */}
       <GroupHeader label={T.account} />
       <Group>
-        <SettingRow icon={<Key className="h-5 w-5" />}   label={T.changePassword} href="/shop/profile" />
-        <SettingRow icon={<Mail className="h-5 w-5" />}  label={T.changeEmail}    href="/shop/profile" />
-        <SettingRow icon={<Phone className="h-5 w-5" />} label={T.changePhone}    href="/shop/profile" />
+        <SettingRow icon={<Key className="h-5 w-5" />}   label={T.changePassword} onClick={() => setPwOpen(true)} />
+        <SettingRow icon={<Mail className="h-5 w-5" />}  label={T.changeEmail}    onClick={() => setEmailOpen(true)} />
+        <SettingRow icon={<Phone className="h-5 w-5" />} label={T.changePhone}    onClick={() => setPhoneOpen(true)} />
       </Group>
 
       {/* 2 ── Notifications */}
@@ -337,9 +462,8 @@ export default function SettingsPage() {
       {/* 6 ── About */}
       <GroupHeader label={T.about} />
       <Group>
-        <SettingRow icon={<Lock className="h-4 w-4" />} label={T.privacyPolicy}  href="/shop/profile" />
-        <SettingRow icon={<Info className="h-4 w-4" />} label={T.termsOfService} href="/shop/profile" />
-        <SettingRow icon={<Star className="h-4 w-4" />} label={T.rateApp}        href="/shop/profile" />
+        <SettingRow icon={<Lock className="h-4 w-4" />} label={T.privacyPolicy}  href="/shop/privacy" />
+        <SettingRow icon={<Info className="h-4 w-4" />} label={T.termsOfService} href="/shop/terms" />
         <SettingRow label={T.version} value="1.0.0" noChevron />
       </Group>
 
@@ -440,6 +564,10 @@ export default function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ChangePasswordDialog open={pwOpen}    onClose={() => setPwOpen(false)} />
+      <ChangeEmailDialog    open={emailOpen} onClose={() => setEmailOpen(false)} />
+      <ChangePhoneDialog    open={phoneOpen} onClose={() => setPhoneOpen(false)} />
     </div>
   );
 }

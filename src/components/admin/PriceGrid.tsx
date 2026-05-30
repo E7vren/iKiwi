@@ -187,7 +187,7 @@ export function PriceGrid() {
               <div className="flex items-center gap-2">
                 <span className="text-xl">{category.icon}</span>
                 <h2 className="font-semibold text-base">{getCategoryName(category, locale)}</h2>
-                <span className="text-xs text-muted-foreground bg-gray-100 rounded-full px-2 py-0.5">
+                <span className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-0.5">
                   {items.length}
                 </span>
               </div>
@@ -196,7 +196,7 @@ export function PriceGrid() {
               <div className="rounded-xl border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b bg-gray-50">
+                    <tr className="border-b bg-muted/30">
                       <th className="text-left px-4 py-2 font-medium text-muted-foreground text-xs">Product</th>
                       <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs w-44">Price / kg</th>
                       <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs w-44">Price / pcs</th>

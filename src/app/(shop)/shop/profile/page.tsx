@@ -8,7 +8,7 @@ import {
   Bell, ChevronRight, ClipboardList, CreditCard,
   FileText, Heart, HelpCircle, Lock,
   LogOut, MapPin, Pencil, Phone, Plus,
-  Settings, Star, Store, Trash2,
+  Settings, Store, Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
@@ -30,6 +30,8 @@ import { ShopLocationForm, type LocationValue } from "@/components/shop/ShopLoca
 import { getMyShops, addShop, updateMyShop, deleteMyShop, getMyStats, type MyShop } from "@/server/actions/shops";
 import { ContactModal } from "@/components/shop/ContactModal";
 import { AppFooter } from "@/components/shared/AppFooter";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslations } from "@/lib/translations";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -47,7 +49,7 @@ function compact(n: number) {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <h3 className="mt-6 mb-2 text-[11px] font-semibold uppercase tracking-[0.6px] text-[#5F6368]">
+    <h3 className="mt-6 mb-2 text-[11px] font-semibold uppercase tracking-[0.6px] text-muted-foreground">
       {label}
     </h3>
   );
@@ -87,7 +89,7 @@ function MenuRow({ icon, label, badge, href, onClick, danger, noChevron }: RowPr
         {label}
       </span>
       {badge && <span className="text-[12px] text-muted-foreground mr-1 shrink-0">{badge}</span>}
-      {!noChevron && <ChevronRight className="h-[18px] w-[18px] shrink-0 text-[#9E9E9E]" />}
+      {!noChevron && <ChevronRight className="h-[18px] w-[18px] shrink-0 text-muted-foreground" />}
     </div>
   );
 
@@ -207,6 +209,8 @@ function Section({ delay, children }: { delay: number; children: React.ReactNode
 export default function ProfilePage() {
   const { data: session } = useSession();
   const qc = useQueryClient();
+  const locale = useLocaleStore((s) => s.locale);
+  const T = useTranslations(locale);
   const [editShop, setEditShop]         = useState<MyShop | null>(null);
   const [addOpen, setAddOpen]           = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<MyShop | null>(null);
@@ -232,9 +236,9 @@ export default function ProfilePage() {
       <Section delay={0}>
         <div className="rounded-2xl bg-card border border-border shadow-sm p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-base">My Shops</h3>
+            <h3 className="font-semibold text-base">{T.myShops}</h3>
             <Button size="sm" variant="outline" onClick={() => setAddOpen(true)} className="gap-1 h-8">
-              <Plus className="h-3.5 w-3.5" /> Add Shop
+              <Plus className="h-3.5 w-3.5" /> {T.addShop}
             </Button>
           </div>
           {shopsLoading ? (
@@ -243,7 +247,7 @@ export default function ProfilePage() {
             </div>
           ) : shops.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No shops yet. Add your first shop.
+              {T.noShopsYet}
             </p>
           ) : (
             <div className="space-y-2">
@@ -255,7 +259,7 @@ export default function ProfilePage() {
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                         shop.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
                       }`}>
-                        {shop.isActive ? "Active" : "Inactive"}
+                        {shop.isActive ? T.active : T.inactive}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -287,7 +291,7 @@ export default function ProfilePage() {
 
       {/* 2 ── Stats */}
       <Section delay={0.06}>
-        <SectionHeader label="This Month" />
+        <SectionHeader label={T.thisMonth} />
         <Link href="/shop/orders" className="block">
           <div className="rounded-2xl bg-card border border-border shadow-sm px-2 py-4 hover:bg-accent transition-colors">
             {statsLoading ? (
@@ -302,12 +306,12 @@ export default function ProfilePage() {
             ) : (
               <div className="grid grid-cols-3 divide-x divide-border">
                 {([
-                  { value: String(stats?.count ?? 0),               label: "Orders" },
-                  { value: `${compact(stats?.totalSpent ?? 0)} UZS`, label: "Total Spent" },
-                  { value: `${compact(stats?.avgOrder ?? 0)} UZS`,   label: "Avg Order" },
+                  { value: String(stats?.count ?? 0),               label: T.orders },
+                  { value: `${compact(stats?.totalSpent ?? 0)} UZS`, label: T.totalSpent },
+                  { value: `${compact(stats?.avgOrder ?? 0)} UZS`,   label: T.avgOrder },
                 ] as const).map(({ value, label }) => (
                   <div key={label} className="flex flex-col items-center px-2 py-1">
-                    <span className="text-[17px] font-bold text-[#1A1A1A] tabular-nums leading-tight">
+                    <span className="text-[17px] font-bold text-foreground tabular-nums leading-tight">
                       {value}
                     </span>
                     <span className="text-[11px] text-muted-foreground mt-0.5">{label}</span>
@@ -321,53 +325,52 @@ export default function ProfilePage() {
 
       {/* 3 ── Account */}
       <Section delay={0.12}>
-        <SectionHeader label="Account" />
+        <SectionHeader label={T.account} />
         <MenuCard>
-          <MenuRow icon={<Store className="h-5 w-5" />}      label="Shop Information"  onClick={() => setAddOpen(true)} />
-          <MenuRow icon={<MapPin className="h-5 w-5" />}     label="Delivery Address"  href="/shop/orders" />
-          <MenuRow icon={<CreditCard className="h-5 w-5" />} label="Payment Method"    href="/shop/profile" />
+          <MenuRow icon={<Store className="h-5 w-5" />}      label={T.shopInformation} onClick={() => setAddOpen(true)} />
+          <MenuRow icon={<MapPin className="h-5 w-5" />}     label={T.deliveryAddress} href="/shop/orders" />
+          <MenuRow icon={<CreditCard className="h-5 w-5" />} label={T.paymentMethod}   href="/shop/payment" />
         </MenuCard>
       </Section>
 
       {/* 4 ── Activity */}
       <Section delay={0.18}>
-        <SectionHeader label="Activity" />
+        <SectionHeader label={T.activity} />
         <MenuCard>
           <MenuRow
             icon={<ClipboardList className="h-5 w-5" />}
-            label="Order History"
-            badge={stats?.count ? `${stats.count} this month` : undefined}
+            label={T.orderHistory}
+            badge={stats?.count ? `${stats.count} ${T.thisMonthCount}` : undefined}
             href="/shop/orders"
           />
-          <MenuRow icon={<Heart className="h-5 w-5" />}        label="Favourite Products" href="/shop" />
-          <MenuRow icon={<Bell className="h-5 w-5" />}         label="Price Alerts"        href="/shop/notifications" />
-          <MenuRow icon={<ClipboardList className="h-5 w-5" />} label="Order Templates"    href="/shop/orders" />
+          <MenuRow icon={<Heart className="h-5 w-5" />}        label={T.favouriteProducts} href="/shop" />
+          <MenuRow icon={<Bell className="h-5 w-5" />}         label={T.priceAlerts}        href="/shop/notifications" />
+          <MenuRow icon={<ClipboardList className="h-5 w-5" />} label={T.orderTemplates}   href="/shop/orders" />
         </MenuCard>
       </Section>
 
       {/* 5 ── Preferences */}
       <Section delay={0.22}>
-        <SectionHeader label="Preferences" />
+        <SectionHeader label={T.preferences} />
         <MenuCard>
-          <MenuRow icon={<Settings className="h-5 w-5" />} label="Settings" href="/shop/settings" />
+          <MenuRow icon={<Settings className="h-5 w-5" />} label={T.settings} href="/shop/settings" />
         </MenuCard>
       </Section>
 
       {/* 6 ── Support */}
       <Section delay={0.26}>
-        <SectionHeader label="Support" />
+        <SectionHeader label={T.support} />
         <MenuCard>
-          <MenuRow icon={<Phone className="h-5 w-5" />}         label="Contact iKiwi"    onClick={() => setContactOpen(true)} />
-          <MenuRow icon={<HelpCircle className="h-5 w-5" />}    label="Help & FAQ"        href="/help" />
-          <MenuRow icon={<Star className="h-5 w-5" />}          label="Rate iKiwi"        href="/shop/profile" />
+          <MenuRow icon={<Phone className="h-5 w-5" />}         label={T.contactIkiwi}   onClick={() => setContactOpen(true)} />
+          <MenuRow icon={<HelpCircle className="h-5 w-5" />}    label={T.helpFaq}         href="/help" />
         </MenuCard>
       </Section>
 
       {/* 7 ── About */}
       <Section delay={0.3}>
         <div className="mt-6 rounded-2xl bg-card border border-border shadow-sm overflow-hidden divide-y divide-border">
-          <MenuRow icon={<FileText className="h-4 w-4" />} label="Terms of Service" href="/shop/profile" />
-          <MenuRow icon={<Lock className="h-4 w-4" />}     label="Privacy Policy"   href="/shop/profile" />
+          <MenuRow icon={<FileText className="h-4 w-4" />} label={T.termsOfService} href="/shop/terms" />
+          <MenuRow icon={<Lock className="h-4 w-4" />}     label={T.privacyPolicy}  href="/shop/privacy" />
           <div className="flex items-center h-14 px-4 gap-3">
             <span className="text-muted-foreground text-sm shrink-0">ℹ️</span>
             <span className="flex-1 text-[15px] text-muted-foreground">Version 1.0.0</span>
@@ -381,7 +384,7 @@ export default function ProfilePage() {
           <MenuCard>
             <MenuRow
               icon={<LogOut className="h-5 w-5" />}
-              label="Sign Out"
+              label={T.signOut}
               danger noChevron
               onClick={() => setSignOutOpen(true)}
             />
@@ -411,7 +414,7 @@ export default function ProfilePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{T.cancel}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={async () => {
@@ -439,7 +442,7 @@ export default function ProfilePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{T.cancel}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={() => signOut({ callbackUrl: "/login" })}

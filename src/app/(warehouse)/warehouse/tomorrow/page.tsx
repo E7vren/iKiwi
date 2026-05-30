@@ -49,7 +49,7 @@ export default function TomorrowOrdersPage() {
 
       {orders.map((order: Order) => (
         <div key={order.id} className="rounded-xl border bg-card shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
+          <div className="px-4 py-3 border-b bg-muted/40 flex items-center justify-between">
             <div>
               <p className="font-semibold text-sm">{order.shop.name}</p>
               {order.shop.address && (
@@ -64,7 +64,7 @@ export default function TomorrowOrdersPage() {
           <div className="px-4 py-3 space-y-1">
             {order.items.map((item) => (
               <div key={item.id} className="flex justify-between text-sm">
-                <span className="text-gray-700">{item.product.name}</span>
+                <span className="text-foreground">{item.product.name}</span>
                 <span className="font-medium">
                   {item.orderedAs === "KG"
                     ? `${fmt(item.requestedKg ?? 0)} kg`
@@ -74,7 +74,7 @@ export default function TomorrowOrdersPage() {
             ))}
           </div>
 
-          <div className="px-4 py-2 border-t bg-gray-50 flex justify-end">
+          <div className="px-4 py-2 border-t bg-muted/40 flex justify-end">
             <span className="text-sm font-semibold">
               Est. {order.estimatedTotal.toLocaleString("ru-RU")} UZS
             </span>

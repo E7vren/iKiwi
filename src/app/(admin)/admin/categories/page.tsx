@@ -227,13 +227,13 @@ export default function CategoriesPage() {
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-14 animate-pulse rounded-lg bg-gray-100" />
+            <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />
           ))}
         </div>
       ) : categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center rounded-xl border bg-card">
           <div className="text-5xl mb-4">🏷️</div>
-          <p className="text-lg font-semibold text-gray-800">No categories yet</p>
+          <p className="text-lg font-semibold text-foreground">No categories yet</p>
           <p className="text-sm text-muted-foreground mt-1 mb-6">
             Create your first category to organize products
           </p>
@@ -263,7 +263,7 @@ export default function CategoriesPage() {
                   <TableCell className="font-medium">{cat.nameEn}</TableCell>
                   <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">{cat.nameUz}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{cat.slug}</code>
+                    <code className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{cat.slug}</code>
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="secondary" className="tabular-nums">
@@ -357,7 +357,7 @@ export default function CategoriesPage() {
             <AlertDialogDescription asChild>
               {hasProducts ? (
                 <div className="space-y-2">
-                  <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-sm">
+                  <p className="text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 rounded-lg px-3 py-2.5 text-sm">
                     ⚠️ This category has{" "}
                     <strong>{deleteTarget?._count.products} products</strong>.
                     Reassign them to another category first, or delete them.

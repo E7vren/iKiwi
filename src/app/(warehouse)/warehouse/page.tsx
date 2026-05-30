@@ -45,11 +45,11 @@ const PRIORITY_BADGE: Record<string, string> = {
   URGENT: "bg-red-100 text-red-700",
   HIGH:   "bg-orange-100 text-orange-700",
   NORMAL: "bg-blue-100 text-blue-700",
-  LOW:    "bg-gray-100 text-gray-500",
+  LOW:    "bg-muted text-muted-foreground",
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  PENDING:     "bg-gray-100 text-gray-600",
+  PENDING:     "bg-muted text-muted-foreground",
   ASSIGNED:    "bg-blue-100 text-blue-700",
   IN_PROGRESS: "bg-amber-100 text-amber-700",
   COMPLETED:   "bg-green-100 text-green-700",
@@ -199,14 +199,14 @@ function CompleteScreen({ task, onBack, onDone }: { task: Task; onBack: () => vo
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-gray-50">
+    <div className="flex flex-col min-h-dvh bg-background">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-card border-b px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-accent active:bg-muted transition-colors"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
@@ -237,7 +237,7 @@ function CompleteScreen({ task, onBack, onDone }: { task: Task; onBack: () => vo
 
           return (
             <Card key={item.id} className="border-0 shadow-sm overflow-hidden">
-              <div className="border-b bg-gray-50 px-4 py-3">
+              <div className="border-b bg-muted/40 px-4 py-3">
                 <p className="text-base font-bold">{item.product.name}</p>
                 <p className="text-sm text-muted-foreground">
                   Needed:{" "}
@@ -308,7 +308,7 @@ function CompleteScreen({ task, onBack, onDone }: { task: Task; onBack: () => vo
 
       {/* Sticky bottom summary + confirm */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-lg px-4 pt-3 pb-6 space-y-3">
-        <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-1">
+        <div className="rounded-xl bg-muted/40 px-4 py-3 space-y-1">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Total cost paid</span>
             <span className="font-bold">{totalCost.toLocaleString()} UZS</span>
@@ -534,7 +534,7 @@ export default function WarehouseTasksPage() {
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-accent active:bg-muted transition-colors"
         >
           <RefreshCw className={`h-5 w-5 text-muted-foreground ${isFetching ? "animate-spin" : ""}`} />
         </button>
@@ -547,7 +547,7 @@ export default function WarehouseTasksPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <AlertTriangle className="h-8 w-8 text-gray-400" />
           </div>
           <p className="text-base font-semibold text-gray-600">No tasks here</p>

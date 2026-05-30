@@ -13,6 +13,7 @@ import {
   warehouseIncomingSchema,
   warehouseStockCountSchema,
 } from "@/lib/validations/inventory.schema";
+import { serializeDecimals } from "@/lib/serialize";
 import type { ActionResult } from "@/types";
 
 async function requireAdmin() {
@@ -37,27 +38,29 @@ export async function getAllStockForStaff() {
   ) {
     throw new Error("Unauthorized");
   }
-  return prisma.stockItem.findMany({
+  const items = await prisma.stockItem.findMany({
     include: {
       product: { include: { category: true } },
     },
     orderBy: { product: { name: "asc" } },
   });
+  return serializeDecimals(items);
 }
 
 export async function getAllStock() {
   await requireAdmin();
-  return prisma.stockItem.findMany({
+  const items = await prisma.stockItem.findMany({
     include: {
       product: { include: { category: true } },
     },
     orderBy: { product: { name: "asc" } },
   });
+  return serializeDecimals(items);
 }
 
 export async function getStockByProduct(productId: string) {
   await requireAdmin();
-  return prisma.stockItem.findUnique({
+  const item = await prisma.stockItem.findUnique({
     where: { productId },
     include: {
       product: true,
@@ -67,6 +70,7 @@ export async function getStockByProduct(productId: string) {
       },
     },
   });
+  return serializeDecimals(item);
 }
 
 export async function getLowStockProducts() {
@@ -74,13 +78,15 @@ export async function getLowStockProducts() {
   const all = await prisma.stockItem.findMany({
     include: { product: { include: { category: true } } },
   });
-  return all.filter((s) => {
-    const kgLow =
-      s.minStockKg != null && s.availableKg != null && Number(s.availableKg) < Number(s.minStockKg);
-    const piecesLow =
-      s.minStockPieces != null && s.availablePieces != null && s.availablePieces < s.minStockPieces;
-    return kgLow || piecesLow;
-  });
+  return serializeDecimals(
+    all.filter((s) => {
+      const kgLow =
+        s.minStockKg != null && s.availableKg != null && Number(s.availableKg) < Number(s.minStockKg);
+      const piecesLow =
+        s.minStockPieces != null && s.availablePieces != null && s.availablePieces < s.minStockPieces;
+      return kgLow || piecesLow;
+    })
+  );
 }
 
 // ─── Manual adjustment ────────────────────────────────────────────────────────
@@ -125,7 +131,7 @@ export async function getStockMovements(opts?: {
   if (opts?.productId) where.stockItem = { productId: opts.productId };
   if (opts?.type) where.type = opts.type;
 
-  return prisma.stockMovement.findMany({
+  const movements = await prisma.stockMovement.findMany({
     where,
     include: {
       stockItem: { include: { product: { include: { category: true } } } },
@@ -135,6 +141,7 @@ export async function getStockMovements(opts?: {
     take: opts?.limit ?? 100,
     skip: opts?.offset ?? 0,
   });
+  return serializeDecimals(movements);
 }
 
 // ─── Reorder point / supplier settings ───────────────────────────────────────

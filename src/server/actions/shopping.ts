@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { normalizeError } from "@/lib/errors";
 import { triggerEvent } from "@/lib/pusher";
+import { serializeDecimals } from "@/lib/serialize";
 import type { ActionResult } from "@/types";
 
 export type ShoppingItem = {
@@ -298,7 +299,7 @@ export async function getShoppingList(): Promise<ActionResult<ShoppingListTask |
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: task };
+    return { success: true, data: serializeDecimals(task) };
   } catch (e) {
     return { success: false, error: normalizeError(e) };
   }

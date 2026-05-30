@@ -51,7 +51,7 @@ const ROUTE_COLORS = [
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   PLANNED:     { label: "Planned",     cls: "bg-blue-100 text-blue-700" },
   IN_PROGRESS: { label: "In Progress", cls: "bg-emerald-100 text-emerald-700" },
-  COMPLETED:   { label: "Completed",   cls: "bg-gray-100 text-gray-600" },
+  COMPLETED:   { label: "Completed",   cls: "bg-muted text-muted-foreground" },
   CANCELLED:   { label: "Cancelled",   cls: "bg-red-100 text-red-600" },
 };
 
@@ -122,7 +122,7 @@ function RouteCard({
   onSelect: (id: string | null) => void;
 }) {
   const color = ROUTE_COLORS[index % ROUTE_COLORS.length];
-  const badge = STATUS_BADGE[route.status] ?? { label: route.status, cls: "bg-gray-100 text-gray-600" };
+  const badge = STATUS_BADGE[route.status] ?? { label: route.status, cls: "bg-muted text-muted-foreground" };
 
   const dist = route.totalDistanceKm != null
     ? `${Number(route.totalDistanceKm).toFixed(1)} km`

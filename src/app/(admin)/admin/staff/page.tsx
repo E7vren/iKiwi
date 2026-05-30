@@ -58,6 +58,12 @@ import {
   getStaffDetails,
   updateDeliveryStaff,
 } from "@/server/actions/delivery-staff";
+import {
+  createWarehouseStaff,
+  getAllWarehouseStaffAdmin,
+  resetWarehouseStaffPassword,
+  toggleWarehouseStaffActive,
+} from "@/server/actions/restock";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,7 +84,7 @@ const VEHICLE_LABELS = ["MOTORCYCLE", "CAR", "VAN", "TRUCK"] as const;
 const ROUTE_STATUS: Record<string, { label: string; cls: string }> = {
   PLANNED:     { label: "Planned",   cls: "bg-blue-100 text-blue-700" },
   IN_PROGRESS: { label: "In Progress", cls: "bg-emerald-100 text-emerald-700" },
-  COMPLETED:   { label: "Completed", cls: "bg-gray-100 text-gray-600" },
+  COMPLETED:   { label: "Completed", cls: "bg-muted text-muted-foreground" },
   CANCELLED:   { label: "Cancelled", cls: "bg-red-100 text-red-600" },
 };
 
@@ -528,7 +534,7 @@ function StaffDetailSheet({
             </div>
 
             {/* Vehicle info */}
-            <div className="rounded-xl border bg-gray-50 p-4 space-y-2">
+            <div className="rounded-xl border bg-muted/40 p-4 space-y-2">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Vehicle</h3>
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{VEHICLE_ICON[details.staff.vehicleType]}</span>
@@ -557,7 +563,7 @@ function StaffDetailSheet({
                   { label: "Return rate", value: `${details.stats.returnRate}%`, unit: "" },
                 ].map((s) => (
                   <div key={s.label} className="rounded-lg border bg-card p-3 text-center">
-                    <p className="text-lg font-bold text-gray-900">{s.value}</p>
+                    <p className="text-lg font-bold text-foreground">{s.value}</p>
                     <p className="text-[10px] text-muted-foreground leading-tight">{s.label}</p>
                     {s.unit && <p className="text-[10px] text-muted-foreground">{s.unit}</p>}
                   </div>
@@ -575,7 +581,7 @@ function StaffDetailSheet({
               ) : (
                 <div className="space-y-2">
                   {details.recentRoutes.map((r) => {
-                    const badge = ROUTE_STATUS[r.status] ?? { label: r.status, cls: "bg-gray-100 text-gray-600" };
+                    const badge = ROUTE_STATUS[r.status] ?? { label: r.status, cls: "bg-muted text-muted-foreground" };
                     return (
                       <div key={r.id} className="flex items-center justify-between rounded-lg border px-3 py-2.5 bg-card text-sm">
                         <div>
@@ -628,11 +634,278 @@ function StaffDetailSheet({
   );
 }
 
+// ─── Warehouse staff types ────────────────────────────────────────────────────
+
+type WHStaff = Awaited<ReturnType<typeof getAllWarehouseStaffAdmin>>[number];
+
+// ─── Add Warehouse Staff Dialog ───────────────────────────────────────────────
+
+function AddWarehouseDialog({
+  open,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [showPw, setShowPw] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const res = await createWarehouseStaff(form);
+    setBusy(false);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success("Warehouse staff added");
+    setForm({ fullName: "", email: "", phone: "", password: "" });
+    onClose();
+    onSuccess();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Add Warehouse Staff</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Full Name</Label>
+            <Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} placeholder="Akbar Karimov" required />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="akbar@ikiwi.uz" required />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Phone</Label>
+            <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+998901234567" required />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Password</Label>
+            <div className="relative">
+              <Input
+                type={showPw ? "text" : "password"}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="Min 8 characters"
+                required
+                minLength={8}
+              />
+              <button type="button" onClick={() => setShowPw((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy}>
+              {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Add Staff
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Reset Warehouse Password Dialog ─────────────────────────────────────────
+
+function ResetWHPasswordDialog({
+  staff,
+  onClose,
+}: {
+  staff: WHStaff | null;
+  onClose: () => void;
+}) {
+  const [showPw, setShowPw] = useState(false);
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!staff) return;
+    setBusy(true);
+    const res = await resetWarehouseStaffPassword(staff.id, password);
+    setBusy(false);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success("Password updated");
+    setPassword("");
+    onClose();
+  }
+
+  return (
+    <Dialog open={!!staff} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Reset Password — {staff?.fullName}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>New Password</Label>
+            <div className="relative">
+              <Input
+                type={showPw ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min 8 characters"
+                required
+                minLength={8}
+              />
+              <button type="button" onClick={() => setShowPw((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy || password.length < 8}>
+              {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Update Password
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Warehouse Staff Tab ──────────────────────────────────────────────────────
+
+function WarehouseStaffTab() {
+  const [whStaff, setWhStaff] = useState<WHStaff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<WHStaff | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try { setWhStaff(await getAllWarehouseStaffAdmin()); }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleToggle(s: WHStaff) {
+    setTogglingId(s.id);
+    const res = await toggleWarehouseStaffActive(s.id);
+    setTogglingId(null);
+    if (!res.success) { toast.error(res.error); return; }
+    toast.success(s.isActive ? "Staff deactivated" : "Staff activated");
+    load();
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {whStaff.length} staff · {whStaff.filter((s) => s.isActive).length} active
+        </p>
+        <Button size="sm" onClick={() => setAddOpen(true)}>
+          <Plus className="h-4 w-4 mr-1.5" /> Add Warehouse Staff
+        </Button>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl bg-card border border-border shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="p-6 space-y-3">
+            {[1, 2, 3].map((k) => <Skeleton key={k} className="h-14 w-full" />)}
+          </div>
+        ) : whStaff.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="text-4xl mb-3">🏭</p>
+            <p className="font-medium text-foreground">No warehouse staff yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Add your first warehouse staff member to get started</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-10" />
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                <TableHead className="hidden md:table-cell">Phone</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-40">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {whStaff.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell>
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                      {getInitials(s.fullName)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-medium text-sm">{s.fullName}</p>
+                    <p className="text-xs text-muted-foreground sm:hidden">{s.user.email}</p>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
+                    {s.user.email}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                    {s.phone}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={s.isActive ? "bg-green-100 text-green-700 border-0" : "bg-muted text-muted-foreground border-0"}>
+                      {s.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs px-2"
+                        onClick={() => setResetTarget(s)}
+                      >
+                        <KeyRound className="h-3 w-3 mr-1" /> Password
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={`h-7 w-7 ${s.isActive ? "hover:text-red-600" : "hover:text-green-700"}`}
+                        disabled={togglingId === s.id}
+                        onClick={() => handleToggle(s)}
+                        title={s.isActive ? "Deactivate" : "Activate"}
+                      >
+                        {togglingId === s.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : s.isActive ? (
+                          <UserX className="h-3.5 w-3.5" />
+                        ) : (
+                          <UserCheck className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+
+      <AddWarehouseDialog open={addOpen} onClose={() => setAddOpen(false)} onSuccess={load} />
+      <ResetWHPasswordDialog staff={resetTarget} onClose={() => setResetTarget(null)} />
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 type SortKey = "fullName" | "vehicleType" | "status" | "today";
 
 export default function AdminStaffPage() {
+  const [tab, setTab] = useState<"delivery" | "warehouse">("delivery");
   const [staff, setStaff] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "fullName", dir: "asc" });
@@ -689,17 +962,34 @@ export default function AdminStaffPage() {
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-headline-lg">Delivery Staff</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {staff.length} drivers · {staff.filter((s) => s.isActive).length} active
-          </p>
-        </div>
-        <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={() => setAddOpen(true)}>
-          <Plus className="h-4 w-4 mr-1.5" />
-          Add Staff Member
-        </Button>
+        <h1 className="text-headline-lg">Staff</h1>
+        {tab === "delivery" && (
+          <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={() => setAddOpen(true)}>
+            <Plus className="h-4 w-4 mr-1.5" /> Add Driver
+          </Button>
+        )}
       </div>
+
+      {/* Tab toggle */}
+      <div className="flex gap-1 border-b border-border">
+        {(["delivery", "warehouse"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              tab === t
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t === "delivery" ? "🚚 Delivery Staff" : "🏭 Warehouse Staff"}
+          </button>
+        ))}
+      </div>
+
+      {tab === "warehouse" && <WarehouseStaffTab />}
+      {tab === "delivery" && (<>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
@@ -897,6 +1187,7 @@ export default function AdminStaffPage() {
         onResetPassword={setResetTarget}
         onToggleActive={handleToggleActive}
       />
+      </>)}
     </div>
   );
 }

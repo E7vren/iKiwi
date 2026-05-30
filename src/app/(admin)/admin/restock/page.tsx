@@ -69,7 +69,7 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
 };
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
-  PENDING: "bg-gray-100 text-gray-700",
+  PENDING: "bg-muted text-muted-foreground",
   ASSIGNED: "bg-blue-100 text-blue-700",
   IN_PROGRESS: "bg-amber-100 text-amber-700",
   COMPLETED: "bg-green-100 text-green-700",
@@ -79,7 +79,7 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
 const PRIORITY_COLORS: Record<string, string> = {
   URGENT: "bg-red-100 text-red-700",
   HIGH: "bg-orange-100 text-orange-700",
-  NORMAL: "bg-gray-100 text-gray-600",
+  NORMAL: "bg-muted text-muted-foreground",
   LOW: "bg-slate-100 text-slate-500",
 };
 
@@ -359,7 +359,7 @@ function CreateDialog({
             <div
               key={s}
               className={`h-1.5 flex-1 rounded-full transition-colors ${
-                s <= step ? "bg-primary" : "bg-gray-200"
+                s <= step ? "bg-primary" : "bg-muted"
               }`}
             />
           ))}
@@ -404,7 +404,7 @@ function CreateDialog({
                   {items.map((item) => (
                     <div
                       key={item.productId}
-                      className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2"
+                      className="flex items-center gap-2 rounded-lg bg-muted/40 px-3 py-2"
                     >
                       <span className="flex-1 text-sm font-medium">{item.productName}</span>
                       <Input
@@ -477,7 +477,7 @@ function CreateDialog({
           {step === 3 && (
             <div className="space-y-4">
               <p className="text-sm font-medium">Review & add notes</p>
-              <div className="rounded-lg bg-gray-50 p-3 space-y-1">
+              <div className="rounded-lg bg-muted/40 p-3 space-y-1">
                 <p className="text-xs text-muted-foreground">
                   {items.length} product{items.length !== 1 ? "s" : ""}
                 </p>
@@ -596,7 +596,7 @@ function TaskCard({ task, staff }: { task: Task; staff: Staff[] }) {
               <button
                 type="button"
                 onClick={() => setExpanded((e) => !e)}
-                className="rounded p-1 hover:bg-gray-100 transition-colors"
+                className="rounded p-1 hover:bg-accent transition-colors"
               >
                 <ChevronDown
                   className={`h-4 w-4 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
@@ -628,7 +628,7 @@ function TaskCard({ task, staff }: { task: Task; staff: Staff[] }) {
                       </p>
                     </div>
                   ) : (
-                    <Badge className="bg-gray-100 text-gray-500 border-0 text-xs shrink-0">
+                    <Badge className="bg-muted text-muted-foreground border-0 text-xs shrink-0">
                       Pending
                     </Badge>
                   )}
@@ -640,7 +640,7 @@ function TaskCard({ task, staff }: { task: Task; staff: Staff[] }) {
                 </div>
               )}
               {task.staffNote && (
-                <div className="rounded bg-gray-50 px-3 py-2 text-xs text-gray-700">
+                <div className="rounded bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                   Staff note: {task.staffNote}
                 </div>
               )}

@@ -45,7 +45,7 @@ const MOVEMENT_LABELS: Record<string, string> = {
 const MOVEMENT_COLORS: Record<string, string> = {
   INITIAL_STOCK:   "bg-blue-100 text-blue-700",
   RESTOCK:         "bg-green-100 text-green-700",
-  ADJUSTMENT:      "bg-gray-100 text-gray-700",
+  ADJUSTMENT:      "bg-muted text-muted-foreground",
   WASTE:           "bg-red-100 text-red-700",
   THEFT:           "bg-red-100 text-red-700",
   COUNT_CORRECTION:"bg-purple-100 text-purple-700",
@@ -232,7 +232,7 @@ export default function StockHistoryPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50/50 text-xs text-muted-foreground">
+              <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
                 <th className="text-left px-5 py-2.5 font-medium">Time</th>
                 <th className="text-left px-3 py-2.5 font-medium">Product</th>
                 <th className="px-3 py-2.5 font-medium">Type</th>
@@ -273,7 +273,7 @@ export default function StockHistoryPage() {
                     </td>
                     <td className="px-3 py-3">
                       <Badge
-                        className={`${MOVEMENT_COLORS[m.type] ?? "bg-gray-100 text-gray-700"} border-0 text-xs`}
+                        className={`${MOVEMENT_COLORS[m.type] ?? "bg-muted text-muted-foreground"} border-0 text-xs`}
                       >
                         {MOVEMENT_LABELS[m.type] ?? m.type}
                       </Badge>

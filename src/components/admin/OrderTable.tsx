@@ -391,7 +391,7 @@ function SetActualCostDialog({ order, onClose }: { order: Order | null; onClose:
           {/* ── Summary + note + actions (sticky bottom) ── */}
           <div className="shrink-0 border-t bg-card px-6 pt-4 pb-6 space-y-4">
             {/* Summary block */}
-            <div className="rounded-xl border bg-gray-50 p-4 space-y-2 text-sm">
+            <div className="rounded-xl border bg-muted/40 p-4 space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
                 <span>{formatPrice(subtotal)}</span>

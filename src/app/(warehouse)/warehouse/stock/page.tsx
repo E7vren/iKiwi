@@ -426,7 +426,7 @@ export default function WarehouseStockPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products…"
-            className="h-11 w-full rounded-xl border-2 border-border bg-gray-50 pl-10 pr-10 text-base focus:border-primary focus:outline-none"
+            className="h-11 w-full rounded-xl border-2 border-border bg-muted/40 pl-10 pr-10 text-base focus:border-primary focus:outline-none"
           />
           {search && (
             <button
@@ -484,7 +484,7 @@ export default function WarehouseStockPage() {
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([cat, rows]) => (
             <div key={cat}>
-              <div className="bg-gray-100 px-4 py-2">
+              <div className="bg-muted/50 px-4 py-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {cat}
                 </p>

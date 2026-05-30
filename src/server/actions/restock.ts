@@ -12,6 +12,7 @@ import {
   createManualRestockSchema,
   restockReceivedSchema,
 } from "@/lib/validations/inventory.schema";
+import { serializeDecimals } from "@/lib/serialize";
 import type { ActionResult } from "@/types";
 
 async function requireAdmin() {
@@ -96,7 +97,7 @@ export async function getRestockTasks(status?: string) {
     if (staff) where.assignedToId = staff.id;
   }
 
-  return prisma.restockTask.findMany({
+  const tasks = await prisma.restockTask.findMany({
     where,
     include: {
       items: { include: { product: { include: { stockItem: true } } } },
@@ -104,6 +105,7 @@ export async function getRestockTasks(status?: string) {
     },
     orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
   });
+  return serializeDecimals(tasks);
 }
 
 export async function getAllWarehouseStaff() {
@@ -381,6 +383,52 @@ export async function createWarehouseStaff(input: unknown): Promise<ActionResult
 
     revalidatePath("/admin/staff");
     return { success: true, data: { id: staff.id } };
+  } catch (e) {
+    return { success: false, error: normalizeError(e) };
+  }
+}
+
+// ─── Admin: list all warehouse staff (active + inactive) ─────────────────────
+
+export async function getAllWarehouseStaffAdmin() {
+  await requireAdmin();
+  return prisma.warehouseStaff.findMany({
+    include: { user: { select: { email: true, id: true } } },
+    orderBy: { fullName: "asc" },
+  });
+}
+
+// ─── Admin: toggle warehouse staff active ────────────────────────────────────
+
+export async function toggleWarehouseStaffActive(
+  staffId: string
+): Promise<ActionResult<void>> {
+  try {
+    await requireAdmin();
+    const staff = await prisma.warehouseStaff.findUniqueOrThrow({ where: { id: staffId } });
+    await prisma.warehouseStaff.update({
+      where: { id: staffId },
+      data: { isActive: !staff.isActive },
+    });
+    revalidatePath("/admin/staff");
+    return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: normalizeError(e) };
+  }
+}
+
+// ─── Admin: reset warehouse staff password ───────────────────────────────────
+
+export async function resetWarehouseStaffPassword(
+  staffId: string,
+  newPassword: string
+): Promise<ActionResult<void>> {
+  try {
+    await requireAdmin();
+    const staff = await prisma.warehouseStaff.findUniqueOrThrow({ where: { id: staffId } });
+    const hash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: staff.userId }, data: { password: hash } });
+    return { success: true, data: undefined };
   } catch (e) {
     return { success: false, error: normalizeError(e) };
   }

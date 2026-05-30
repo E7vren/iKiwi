@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { CoachMarks } from "@/components/shop/CoachMarks";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ProductSheet } from "@/components/shop/ProductSheet";
+import { useShopCtx } from "@/components/shop/ShopShell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCategoryName, formatPrice } from "@/lib/utils";
 import { useLocaleStore } from "@/store/localeStore";
@@ -135,7 +136,7 @@ function HeroBanner() {
       >
         <X className="h-3.5 w-3.5 text-muted-foreground" />
       </button>
-      <p className="text-[14px] font-semibold text-[#1A1A1A] pr-6">{banner.text}</p>
+      <p className="text-[14px] font-semibold text-foreground pr-6">{banner.text}</p>
       <p className="text-[12px] text-muted-foreground mt-0.5">{banner.sub}</p>
     </motion.div>
   );
@@ -160,7 +161,7 @@ function ContinueCard({ cartCount, cartTotal, recentOrder }: {
             <ShoppingCart className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[14px] font-semibold text-[#1A1A1A]">
+            <p className="text-[14px] font-semibold text-foreground">
               🛒 Continue your cart
             </p>
             <p className="text-[12px] text-muted-foreground mt-0.5">
@@ -189,7 +190,7 @@ function ContinueCard({ cartCount, cartTotal, recentOrder }: {
             <RotateCw className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[14px] font-semibold text-[#1A1A1A]">🔁 Reorder your last order</p>
+            <p className="text-[14px] font-semibold text-foreground">🔁 Reorder your last order</p>
             <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
               {preview}{more} · {formatPrice(recentOrder.actualTotal ?? recentOrder.estimatedTotal)} UZS
             </p>
@@ -414,7 +415,7 @@ function RecommendationsCarousel({
     <div className="mt-2">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="text-[15px] font-bold text-[#1A1A1A]">{label}</h2>
+        <h2 className="text-[15px] font-bold text-foreground">{label}</h2>
       </div>
       <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
         {products.map((p) => {
@@ -541,8 +542,8 @@ export default function ShopHomePage() {
   const qc = useQueryClient();
   const locale = useLocaleStore((s) => s.locale);
   const T = useTranslations(locale);
+  const { userName } = useShopCtx();
   const cartItems = useCartStore((s) => s.items);
-  const addItem = useCartStore((s) => s.addItem);
   const favoriteIds = useFavoritesStore((s) => s.ids);
 
   const cartCount = cartItems.reduce((acc, i) => acc + i.qty, 0);
@@ -652,7 +653,8 @@ export default function ShopHomePage() {
     .filter((p) => p.isAvailable && p.categoryId === recommendedCatId && p.pricePerKg != null)
     .slice(0, 8);
 
-  const greeting = getGreeting("👋", T);
+  const firstName = userName.split(" ")[0] || "there";
+  const greeting = getGreeting(firstName, T);
 
   if (isLoading) {
     return (
@@ -687,7 +689,7 @@ export default function ShopHomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <h1 className="text-[22px] font-bold text-[#1A1A1A] leading-tight">
+          <h1 className="text-[22px] font-bold text-foreground leading-tight">
             {greeting.text} {greeting.emoji}
           </h1>
           <p className="text-[13px] text-muted-foreground mt-0.5">{getTodayLabel(locale)}</p>
@@ -803,7 +805,7 @@ export default function ShopHomePage() {
         ) : (
           <>
             <motion.div
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4"
               initial="hidden"
               animate="visible"
               variants={{ visible: { transition: { staggerChildren: 0.04 } } }}

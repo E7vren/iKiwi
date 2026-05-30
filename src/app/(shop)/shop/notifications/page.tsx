@@ -7,14 +7,8 @@ import { cn } from "@/lib/utils";
 import { useLocaleStore } from "@/store/localeStore";
 import { useTranslations } from "@/lib/translations";
 
-const TABS = [
-  { value: "all",     label: "All" },
-  { value: "unread",  label: "Unread" },
-  { value: "orders",  label: "Orders" },
-  { value: "prices",  label: "Prices" },
-] as const;
-
-type Tab = (typeof TABS)[number]["value"];
+const TAB_VALUES = ["all", "unread", "orders", "prices"] as const;
+type Tab = (typeof TAB_VALUES)[number];
 
 const ORDER_TYPES = new Set(["ORDER_PLACED", "STATUS_CHANGED", "ACTUAL_COST_SET"]);
 
@@ -142,6 +136,13 @@ export default function NotificationsPage() {
   const locale = useLocaleStore((s) => s.locale);
   const T = useTranslations(locale);
 
+  const TABS = [
+    { value: "all"    as Tab, label: T.tabAll     },
+    { value: "unread" as Tab, label: T.tabUnread  },
+    { value: "orders" as Tab, label: T.orders     },
+    { value: "prices" as Tab, label: T.tabPrices  },
+  ];
+
   const [notifs,    setNotifs]    = useState<Notif[]>([]);
   const [unread,    setUnread]    = useState(0);
   const [loading,   setLoading]   = useState(true);
@@ -230,7 +231,7 @@ export default function NotificationsPage() {
         <div>
           <h1 className="text-lg font-bold">{T.alerts}</h1>
           {unread > 0 && (
-            <p className="text-xs text-muted-foreground mt-0.5">{unread} unread</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{unread} {T.tabUnread.toLowerCase()}</p>
           )}
         </div>
         {unread > 0 && (
@@ -240,7 +241,7 @@ export default function NotificationsPage() {
             className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
           >
             <CheckCheck className="h-3.5 w-3.5" />
-            Mark all read
+            {T.markAllRead}
           </button>
         )}
       </div>
@@ -282,11 +283,9 @@ export default function NotificationsPage() {
             <Bell className="h-10 w-10 text-muted-foreground/40" />
           </div>
           <div className="space-y-1.5">
-            <p className="font-semibold text-[16px] text-foreground">🔔 You&apos;re all caught up</p>
+            <p className="font-semibold text-[16px] text-foreground">🔔 {T.noNotifications}</p>
             <p className="text-sm text-muted-foreground max-w-xs">
-              {tab === "all"
-                ? "We'll notify you when your order updates or prices change."
-                : `No ${tabLabel.toLowerCase()} notifications yet.`}
+              {T.notifEmptyDesc}
             </p>
           </div>
         </div>

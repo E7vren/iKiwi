@@ -7,6 +7,7 @@ import {
   ArrowUpDown, ChevronDown, ChevronUp, DollarSign, Edit2, ExternalLink,
   ImagePlus, Loader2, Package, Plus, Search, ShoppingCart, Trash2, ToggleLeft, ToggleRight, Upload, X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState, useTransition } from "react";
@@ -216,7 +217,7 @@ function ProductForm({
 
       {/* Prices: editable on create, read-only on edit */}
       {isEdit ? (
-        <div className="rounded-lg bg-gray-50 border px-3 py-2.5 space-y-2">
+        <div className="rounded-lg bg-muted/40 border px-3 py-2.5 space-y-2">
           <p className="text-xs font-medium text-muted-foreground">Today&apos;s prices (read-only)</p>
           <div className="flex gap-6 text-sm">
             {initial.unitType !== "PIECE" && (
@@ -297,7 +298,7 @@ function ProductForm({
             onClick={() => imageInputRef.current?.click()}
           >
             {imagePreview ? (
-              <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+              <Image src={imagePreview} alt="Preview" width={80} height={80} unoptimized className="h-full w-full object-cover" />
             ) : (
               <ImagePlus className="h-6 w-6 text-muted-foreground" />
             )}
@@ -454,7 +455,7 @@ function BulkImportDialog({ onSuccess }: { onSuccess: () => void }) {
                 <p className="text-xs text-destructive">{parseError}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                Expected format: <code className="bg-gray-100 px-1 rounded">{"{ categories: [...], products: [...] }"}</code>
+                Expected format: <code className="bg-muted text-muted-foreground px-1 rounded">{"{ categories: [...], products: [...] }"}</code>
               </p>
             </div>
 
@@ -734,7 +735,7 @@ function ProductsContent() {
       {isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />
+            <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />
           ))}
         </div>
       ) : sorted.length === 0 ? (

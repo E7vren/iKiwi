@@ -111,12 +111,12 @@ export function MapboxMap({ shops }: Props) {
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   if (!token || token.includes("your_mapbox")) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50 rounded-xl border border-dashed border-gray-300">
+      <div className="flex items-center justify-center h-full bg-muted/40 rounded-xl border border-dashed border-border">
         <div className="text-center p-8">
           <p className="text-4xl mb-3">🗺️</p>
-          <p className="font-semibold text-gray-700">Map not configured</p>
+          <p className="font-semibold text-foreground">Map not configured</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Add <code className="bg-gray-100 px-1 rounded text-xs">NEXT_PUBLIC_MAPBOX_TOKEN</code>{" "}
+            Add <code className="bg-muted text-muted-foreground px-1 rounded text-xs">NEXT_PUBLIC_MAPBOX_TOKEN</code>{" "}
             to .env.local
           </p>
           <p className="text-xs text-muted-foreground mt-2">Get a free token at mapbox.com</p>
@@ -180,7 +180,7 @@ export function MapboxMap({ shops }: Props) {
         </div>
 
         {/* Stats overlay */}
-        <div className="p-3 border-t bg-gray-50">
+        <div className="p-3 border-t bg-muted/40">
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className="bg-card rounded-lg p-2 shadow-sm">
               <p className="text-lg font-bold text-primary">

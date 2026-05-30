@@ -200,6 +200,7 @@ export default function AdminShopsPage() {
                 <TableHead>Shop</TableHead>
                 <TableHead className="hidden md:table-cell">Owner</TableHead>
                 <TableHead className="hidden lg:table-cell">Address</TableHead>
+                <TableHead className="hidden sm:table-cell">Payment</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-[160px]">Actions</TableHead>
               </TableRow>
@@ -237,6 +238,11 @@ export default function AdminShopsPage() {
                       <MapPin className="h-3 w-3 shrink-0" />
                       {shop.address}
                     </p>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <span className="text-sm">
+                      {(shop as { paymentMethod?: string }).paymentMethod === "CARD" ? "💳 Card" : "💵 Cash"}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Badge

@@ -158,7 +158,7 @@ function RouteInProgressState({
           </span>
           <span className="text-primary">{Math.round(progress)}% done</span>
         </div>
-        <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
