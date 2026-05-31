@@ -159,18 +159,19 @@ function AddStaffDialog({
     resolver: zodResolver(createStaffSchema),
     defaultValues: {
       fullName:     prefill?.fullName ?? "",
-      email:        prefill?.email    ?? "",
+      email:        prefill?.fullName ? generateWorkEmail(prefill.fullName)    : "",
       phone:        prefill?.phone    ?? "+998",
-      password:     "",
+      password:     prefill?.fullName ? generateWorkPassword(prefill.fullName) : "",
       vehicleType:  (prefill?.vehicleType as "CAR" | "MOTORCYCLE" | "VAN" | "TRUCK" | undefined) ?? "CAR",
       vehiclePlate: prefill?.vehiclePlate ?? "",
     },
   });
 
   useEffect(() => {
-    if (open && prefill) {
-      if (prefill.fullName)     setValue("fullName", prefill.fullName);
-      if (prefill.email)        setValue("email", prefill.email);
+    if (open && prefill?.fullName) {
+      setValue("fullName", prefill.fullName);
+      setValue("email",    generateWorkEmail(prefill.fullName));
+      setValue("password", generateWorkPassword(prefill.fullName));
       if (prefill.phone)        setValue("phone", prefill.phone);
       if (prefill.vehicleType)  setValue("vehicleType", prefill.vehicleType as "CAR" | "MOTORCYCLE" | "VAN" | "TRUCK");
       if (prefill.vehiclePlate) setValue("vehiclePlate", prefill.vehiclePlate);
@@ -646,6 +647,38 @@ function StaffDetailSheet({
   );
 }
 
+// ─── Auto-generate work email + password from name ───────────────────────────
+
+/** Returns the "given name" — last word in Uzbek "Surname Firstname" format. */
+function getGivenName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  return parts[parts.length - 1];
+}
+
+/** Normalize a name to lowercase ASCII letters only. Strips apostrophes & accents. */
+function normalizeName(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[ʻʼ'`ʹ]/g, "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/** "G'ulomov Shohruh" → "shohruh@ikiwi.com" */
+function generateWorkEmail(fullName: string): string {
+  const slug = normalizeName(getGivenName(fullName));
+  return slug ? `${slug}@ikiwi.com` : "";
+}
+
+/** "G'ulomov Shohruh" → "Shohruh123!" */
+function generateWorkPassword(fullName: string): string {
+  const slug = normalizeName(getGivenName(fullName));
+  if (!slug) return "";
+  return slug.charAt(0).toUpperCase() + slug.slice(1) + "123!";
+}
+
 // ─── Warehouse staff types ────────────────────────────────────────────────────
 
 type WHStaff = Awaited<ReturnType<typeof getAllWarehouseStaffAdmin>>[number];
@@ -667,19 +700,19 @@ function AddWarehouseDialog({
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     fullName: prefill?.fullName ?? "",
-    email:    prefill?.email    ?? "",
+    email:    prefill?.fullName ? generateWorkEmail(prefill.fullName)    : "",
     phone:    prefill?.phone    ?? "",
-    password: "",
+    password: prefill?.fullName ? generateWorkPassword(prefill.fullName) : "",
   });
 
   useEffect(() => {
-    if (open && prefill) {
-      setForm((f) => ({
-        ...f,
-        fullName: prefill.fullName ?? f.fullName,
-        email:    prefill.email    ?? f.email,
-        phone:    prefill.phone    ?? f.phone,
-      }));
+    if (open && prefill?.fullName) {
+      setForm({
+        fullName: prefill.fullName,
+        email:    generateWorkEmail(prefill.fullName),
+        phone:    prefill.phone ?? "",
+        password: generateWorkPassword(prefill.fullName),
+      });
     }
   }, [open, prefill]);
 
