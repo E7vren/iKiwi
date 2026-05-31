@@ -81,6 +81,7 @@ export default function ApplicationsPage() {
   function buildStaffUrl(app: App): string {
     const params = new URLSearchParams();
     params.set("apply", "1");
+    params.set("role", app.role);
     params.set("name", app.fullName);
     params.set("phone", app.phone);
     if (app.email) params.set("email", app.email);

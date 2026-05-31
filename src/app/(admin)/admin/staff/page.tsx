@@ -139,10 +139,12 @@ function AddStaffDialog({
   open,
   onClose,
   onSuccess,
+  prefill,
 }: {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  prefill?: { fullName?: string; email?: string; phone?: string; vehicleType?: string; vehiclePlate?: string };
 }) {
   const [showPwd, setShowPwd] = useState(false);
 
@@ -156,14 +158,24 @@ function AddStaffDialog({
   } = useForm<CreateStaffInput>({
     resolver: zodResolver(createStaffSchema),
     defaultValues: {
-      fullName:     "",
-      email:        "",
-      phone:        "+998",
+      fullName:     prefill?.fullName ?? "",
+      email:        prefill?.email    ?? "",
+      phone:        prefill?.phone    ?? "+998",
       password:     "",
-      vehicleType:  "CAR",
-      vehiclePlate: "",
+      vehicleType:  (prefill?.vehicleType as "CAR" | "MOTORCYCLE" | "VAN" | "TRUCK" | undefined) ?? "CAR",
+      vehiclePlate: prefill?.vehiclePlate ?? "",
     },
   });
+
+  useEffect(() => {
+    if (open && prefill) {
+      if (prefill.fullName)     setValue("fullName", prefill.fullName);
+      if (prefill.email)        setValue("email", prefill.email);
+      if (prefill.phone)        setValue("phone", prefill.phone);
+      if (prefill.vehicleType)  setValue("vehicleType", prefill.vehicleType as "CAR" | "MOTORCYCLE" | "VAN" | "TRUCK");
+      if (prefill.vehiclePlate) setValue("vehiclePlate", prefill.vehiclePlate);
+    }
+  }, [open, prefill, setValue]);
 
   const vehicleType = watch("vehicleType");
 
@@ -644,14 +656,32 @@ function AddWarehouseDialog({
   open,
   onClose,
   onSuccess,
+  prefill,
 }: {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  prefill?: { fullName?: string; email?: string; phone?: string };
 }) {
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [form, setForm] = useState({
+    fullName: prefill?.fullName ?? "",
+    email:    prefill?.email    ?? "",
+    phone:    prefill?.phone    ?? "",
+    password: "",
+  });
+
+  useEffect(() => {
+    if (open && prefill) {
+      setForm((f) => ({
+        ...f,
+        fullName: prefill.fullName ?? f.fullName,
+        email:    prefill.email    ?? f.email,
+        phone:    prefill.phone    ?? f.phone,
+      }));
+    }
+  }, [open, prefill]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -776,12 +806,27 @@ function ResetWHPasswordDialog({
 
 // ─── Warehouse Staff Tab ──────────────────────────────────────────────────────
 
-function WarehouseStaffTab() {
+function WarehouseStaffTab({
+  prefill,
+  autoOpen,
+  onConsumePrefill,
+}: {
+  prefill?: { fullName?: string; email?: string; phone?: string };
+  autoOpen?: boolean;
+  onConsumePrefill?: () => void;
+} = {}) {
   const [whStaff, setWhStaff] = useState<WHStaff[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [resetTarget, setResetTarget] = useState<WHStaff | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (autoOpen) {
+      setAddOpen(true);
+      onConsumePrefill?.();
+    }
+  }, [autoOpen, onConsumePrefill]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -894,7 +939,7 @@ function WarehouseStaffTab() {
         )}
       </div>
 
-      <AddWarehouseDialog open={addOpen} onClose={() => setAddOpen(false)} onSuccess={load} />
+      <AddWarehouseDialog open={addOpen} onClose={() => setAddOpen(false)} onSuccess={load} prefill={prefill} />
       <ResetWHPasswordDialog staff={resetTarget} onClose={() => setResetTarget(null)} />
     </div>
   );
@@ -904,11 +949,53 @@ function WarehouseStaffTab() {
 
 type SortKey = "fullName" | "vehicleType" | "status" | "today";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+
 export default function AdminStaffPage() {
-  const [tab, setTab] = useState<"delivery" | "warehouse">("delivery");
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+      <StaffPageInner />
+    </Suspense>
+  );
+}
+
+function StaffPageInner() {
+  const sp = useSearchParams();
+
+  // Read prefill params from URL (e.g. coming from /admin/applications "Accept")
+  const applyParam   = sp.get("apply") === "1";
+  const roleParam    = sp.get("role");
+  const nameParam    = sp.get("name") ?? undefined;
+  const emailParam   = sp.get("email") ?? undefined;
+  const phoneParam   = sp.get("phone") ?? undefined;
+  const vehicleParam = sp.get("vehicleType") ?? undefined;
+  const plateParam   = sp.get("vehiclePlate") ?? undefined;
+
+  const initialTab: "delivery" | "warehouse" =
+    applyParam && roleParam === "WAREHOUSE" ? "warehouse" : "delivery";
+
+  const [tab, setTab] = useState<"delivery" | "warehouse">(initialTab);
   const [staff, setStaff] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "fullName", dir: "asc" });
+
+  // Prefill state — consumed on first render
+  const [deliveryPrefill, setDeliveryPrefill] = useState<{
+    fullName?: string; email?: string; phone?: string; vehicleType?: string; vehiclePlate?: string;
+  } | null>(applyParam && roleParam === "DRIVER" ? {
+    fullName: nameParam, email: emailParam, phone: phoneParam,
+    vehicleType: vehicleParam, vehiclePlate: plateParam,
+  } : null);
+  const [warehousePrefill, setWarehousePrefill] = useState<{
+    fullName?: string; email?: string; phone?: string;
+  } | null>(applyParam && roleParam === "WAREHOUSE" ? {
+    fullName: nameParam, email: emailParam, phone: phoneParam,
+  } : null);
+
+  // Auto-open the right dialog when arriving from applications
+  const [autoOpenDelivery,  setAutoOpenDelivery]  = useState(applyParam && roleParam === "DRIVER");
+  const [autoOpenWarehouse, setAutoOpenWarehouse] = useState(applyParam && roleParam === "WAREHOUSE");
 
   // Dialog/sheet states
   const [addOpen, setAddOpen] = useState(false);
@@ -916,6 +1003,14 @@ export default function AdminStaffPage() {
   const [resetTarget, setResetTarget] = useState<StaffRow | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Auto-open delivery dialog when arriving from a driver application
+  useEffect(() => {
+    if (autoOpenDelivery) {
+      setAddOpen(true);
+      setAutoOpenDelivery(false);
+    }
+  }, [autoOpenDelivery]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -988,7 +1083,16 @@ export default function AdminStaffPage() {
         ))}
       </div>
 
-      {tab === "warehouse" && <WarehouseStaffTab />}
+      {tab === "warehouse" && (
+        <WarehouseStaffTab
+          prefill={warehousePrefill ?? undefined}
+          autoOpen={autoOpenWarehouse}
+          onConsumePrefill={() => {
+            setAutoOpenWarehouse(false);
+            setWarehousePrefill(null);
+          }}
+        />
+      )}
       {tab === "delivery" && (<>
 
       {/* Stats */}
@@ -1167,8 +1271,9 @@ export default function AdminStaffPage() {
       {/* Dialogs & Sheet */}
       <AddStaffDialog
         open={addOpen}
-        onClose={() => setAddOpen(false)}
+        onClose={() => { setAddOpen(false); setDeliveryPrefill(null); }}
         onSuccess={load}
+        prefill={deliveryPrefill ?? undefined}
       />
       <EditStaffDialog
         staff={editTarget}
