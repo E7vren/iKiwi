@@ -55,6 +55,11 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
+  // Landing page — open to everyone (the page itself redirects authed users)
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
   // API routes not handled above — let them through (auth is enforced in server actions)
   if (pathname.startsWith("/api/")) {
     return NextResponse.next();
