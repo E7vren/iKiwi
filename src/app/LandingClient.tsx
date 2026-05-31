@@ -30,7 +30,7 @@ const GALLERY = [
   },
   {
     key: "warehouse",
-    img:  "https://images.unsplash.com/photo-1595351298020-038700609878?auto=format&fit=crop&w=900&q=80",
+    img:  "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80",
     blurb: "Stock counts, restock tasks, history",
   },
   {
