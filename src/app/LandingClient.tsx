@@ -380,6 +380,51 @@ export function LandingClient() {
         </div>
       </section>
 
+      {/* ─── Careers ─────────────────────────────────────────────────────── */}
+      <section className="bg-muted/30 border-y border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">{T.careersTitle}</h2>
+            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">{T.careersSubtitle}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Link
+              href="/careers/apply?role=DRIVER"
+              className="group rounded-2xl border border-border bg-card p-7 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition-all"
+            >
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+                <Truck className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-bold text-xl mb-2">{T.careerDriverTitle}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                {T.careerDriverDesc}
+              </p>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-2.5 transition-all">
+                {T.applyAsDriver}
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
+
+            <Link
+              href="/careers/apply?role=WAREHOUSE"
+              className="group rounded-2xl border border-border bg-card p-7 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition-all"
+            >
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+                <Warehouse className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-bold text-xl mb-2">{T.careerWarehouseTitle}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                {T.careerWarehouseDesc}
+              </p>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-2.5 transition-all">
+                {T.applyAsWarehouse}
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Final CTA ───────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pointer-events-none" />
@@ -418,6 +463,9 @@ export function LandingClient() {
               <span className="text-sm text-muted-foreground">© 2026</span>
             </div>
             <div className="flex items-center gap-6 text-sm">
+              <Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">
+                {T.careers}
+              </Link>
               <Link href="/shop/terms" className="text-muted-foreground hover:text-foreground transition-colors">
                 {T.landTerms}
               </Link>

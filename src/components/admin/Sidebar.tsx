@@ -2,6 +2,7 @@
 
 import {
   Archive,
+  Briefcase,
   ClipboardList,
   History,
   HelpCircle,
@@ -30,6 +31,7 @@ const links = [
   { href: "/admin/orders",     label: "Orders",            icon: ClipboardList },
   { href: "/admin/routes",     label: "Routes",            icon: Truck },
   { href: "/admin/staff",      label: "Staff",             icon: Users },
+  { href: "/admin/applications", label: "Applications",    icon: Briefcase },
   { href: "/admin/categories", label: "Categories",        icon: LayoutList },
   { href: "/admin/products",   label: "Products & Prices", icon: ShoppingCart },
   { href: "/admin/map",        label: "Map",               icon: MapPin },

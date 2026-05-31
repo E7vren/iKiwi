@@ -20,6 +20,26 @@ enum PaymentMethod {
   CARD
 }
 
+enum ApplicationRole {
+  DRIVER
+  WAREHOUSE
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
+enum ApplicationVehicle {
+  CAR
+  MOTORCYCLE
+  VAN
+  TRUCK
+  NONE
+}
+
 enum UnitType {
   KG
   PIECE
@@ -524,4 +544,22 @@ model RestockItem {
   isReceived        Boolean     @default(false)
 
   @@map("restock_items")
+}
+
+model JobApplication {
+  id           String              @id @default(cuid())
+  fullName     String
+  phone        String
+  email        String?
+  role         ApplicationRole
+  vehicleType  ApplicationVehicle?
+  vehiclePlate String?
+  experience   String?
+  status       ApplicationStatus   @default(PENDING)
+  adminNote    String?
+  createdAt    DateTime            @default(now())
+  reviewedAt   DateTime?
+
+  @@index([status, createdAt])
+  @@map("job_applications")
 }

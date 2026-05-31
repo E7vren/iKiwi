@@ -60,6 +60,11 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
+  // Careers — open to everyone
+  if (pathname.startsWith("/careers")) {
+    return NextResponse.next();
+  }
+
   // API routes not handled above — let them through (auth is enforced in server actions)
   if (pathname.startsWith("/api/")) {
     return NextResponse.next();
