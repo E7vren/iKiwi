@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { toast } from "sonner";
 import { useLocaleStore } from "@/store/localeStore";
 import { useTranslations } from "@/lib/translations";
@@ -11,7 +11,7 @@ import { submitJobApplication } from "@/server/actions/applications";
 
 type Vehicle = "CAR" | "MOTORCYCLE" | "VAN" | "TRUCK" | "NONE";
 
-export default function ApplyPage() {
+function ApplyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = useLocaleStore((s) => s.locale);
@@ -57,7 +57,6 @@ export default function ApplyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-2xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5">
@@ -78,7 +77,6 @@ export default function ApplyPage() {
         </div>
       </header>
 
-      {/* Form */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary mb-2">
@@ -90,7 +88,6 @@ export default function ApplyPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Honeypot — hidden field, bots fill in everything */}
           <div className="hidden" aria-hidden="true">
             <label>
               Leave this blank
@@ -200,5 +197,17 @@ export default function ApplyPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <ApplyForm />
+    </Suspense>
   );
 }
