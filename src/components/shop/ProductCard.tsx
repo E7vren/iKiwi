@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertTriangle, Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice, getCategoryName } from "@/lib/utils";
@@ -13,30 +13,9 @@ import { useFavoritesStore } from "@/store/favoritesStore";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
-// Thresholds below which we show "Limited stock"
-const LOW_KG_THRESHOLD    = 5;
-const LOW_PIECE_THRESHOLD = 3;
-
-function getStockStatus(product: Product): "out" | "low" | "ok" {
-  const { unitType, stockAvailableKg, stockAvailablePieces } = product;
-
-  // Not tracked in inventory → always ok (no restriction)
-  if (stockAvailableKg === null && stockAvailablePieces === null) return "ok";
-
-  const kgOut    = unitType !== "PIECE" && stockAvailableKg    != null && stockAvailableKg    <= 0;
-  const pieceOut = unitType !== "KG"    && stockAvailablePieces != null && stockAvailablePieces <= 0;
-  const kgLow    = unitType !== "PIECE" && stockAvailableKg    != null && stockAvailableKg    > 0 && stockAvailableKg    < LOW_KG_THRESHOLD;
-  const pieceLow = unitType !== "KG"    && stockAvailablePieces != null && stockAvailablePieces > 0 && stockAvailablePieces < LOW_PIECE_THRESHOLD;
-
-  // Out of stock: all tracked dimensions are exhausted
-  if (unitType === "BOTH") {
-    if (kgOut && pieceOut) return "out";
-  } else if (unitType === "KG"    && kgOut)    return "out";
-  else if (unitType === "PIECE"  && pieceOut)  return "out";
-
-  if (kgLow || pieceLow) return "low";
-  return "ok";
-}
+// Stock status is intentionally NOT shown to customers — they can always order.
+// When stock is low/zero, the system creates an URGENT restock task for the
+// warehouse team to source the items from the market.
 
 function haptic(ms = 20) {
   if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(ms);
@@ -61,9 +40,6 @@ export function ProductCard({ product, onDetails }: Props) {
 
   const displayName =
     locale === "ru" && product.nameRu ? product.nameRu : product.nameUz || product.name;
-
-  const stockStatus = getStockStatus(product);
-  const isOutOfStock = stockStatus === "out";
 
   return (
     /* relative so the heart button (absolute) is positioned against the card */
@@ -99,31 +75,17 @@ export function ProductCard({ product, onDetails }: Props) {
           <img
             src={product.imageUrl}
             alt={displayName}
-            className={cn("h-full w-full object-cover", isOutOfStock && "opacity-40 grayscale")}
+            className="h-full w-full object-cover"
           />
         ) : (
-          <div className={cn("flex h-full items-center justify-center text-5xl", isOutOfStock && "opacity-40 grayscale")}>
+          <div className="flex h-full items-center justify-center text-5xl">
             {product.category.icon ?? "🛒"}
           </div>
         )}
         <Badge variant="secondary" className="absolute top-2 left-2 text-[10px]">
           {getCategoryName(product.category, locale)}
         </Badge>
-        {/* Stock status overlays */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="rounded-full bg-gray-800/75 px-2.5 py-1 text-[11px] font-semibold text-white">
-              Out of stock
-            </span>
-          </div>
-        )}
-        {stockStatus === "low" && (
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-orange-500/90 px-2 py-0.5">
-            <AlertTriangle className="h-2.5 w-2.5 text-white" />
-            <span className="text-[10px] font-semibold text-white">Limited</span>
-          </div>
-        )}
-        {inCart && !isOutOfStock && (
+        {inCart && (
           <span className="absolute bottom-2 right-2 h-2 w-2 rounded-full bg-primary border-2 border-card" />
         )}
       </button>
@@ -164,7 +126,7 @@ export function ProductCard({ product, onDetails }: Props) {
             </p>
           )}
 
-          {hasPrice && !isOutOfStock && (
+          {hasPrice && (
             <Button
               size="sm"
               className="w-full h-8 text-xs bg-primary hover:bg-primary/90"
@@ -173,11 +135,6 @@ export function ProductCard({ product, onDetails }: Props) {
               <ShoppingCart className="h-3.5 w-3.5 mr-1" />
               {inCart ? T.viewEdit : T.addToCart}
             </Button>
-          )}
-          {isOutOfStock && (
-            <p className="text-center text-[11px] text-muted-foreground py-1">
-              Currently unavailable
-            </p>
           )}
         </div>
       </div>
