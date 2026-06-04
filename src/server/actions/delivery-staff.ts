@@ -274,6 +274,41 @@ export async function adminResetPassword(input: {
   }
 }
 
+/** Admin: reset password AND send credentials to staff email. Returns the plain-text password so admin can also share via SMS/WhatsApp. */
+export async function adminResetAndSendPassword(input: {
+  staffId: string;
+  newPassword: string;
+}): Promise<ActionResult<{ password: string; email: string; sentEmail: boolean }>> {
+  try {
+    await requireAdmin();
+    const { staffId, newPassword } = input;
+    if (newPassword.length < 8) {
+      return { success: false, error: "Password must be at least 8 characters" };
+    }
+    const staff = await prisma.deliveryStaff.findUniqueOrThrow({
+      where: { id: staffId },
+      select: { userId: true, fullName: true, user: { select: { email: true } } },
+    });
+    const hash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: staff.userId }, data: { password: hash } });
+
+    let sentEmail = false;
+    try {
+      await sendStaffCredentialsEmail({
+        staffEmail: staff.user.email,
+        staffName: staff.fullName,
+        password: newPassword,
+      });
+      sentEmail = true;
+    } catch {
+      // Email failure shouldn't block — admin can still see and share password manually
+    }
+    return { success: true, data: { password: newPassword, email: staff.user.email, sentEmail } };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
 export async function updateMyLocation(input: unknown): Promise<ActionResult<void>> {
   try {
     const session = await requireDeliveryStaff();

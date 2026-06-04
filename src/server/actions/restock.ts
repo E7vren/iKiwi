@@ -13,6 +13,7 @@ import {
   restockReceivedSchema,
 } from "@/lib/validations/inventory.schema";
 import { serializeDecimals } from "@/lib/serialize";
+import { sendStaffCredentialsEmail } from "@/lib/email";
 import type { ActionResult } from "@/types";
 
 async function requireAdmin() {
@@ -429,6 +430,40 @@ export async function resetWarehouseStaffPassword(
     const hash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: staff.userId }, data: { password: hash } });
     return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: normalizeError(e) };
+  }
+}
+
+/** Admin: reset warehouse staff password AND send credentials via email. Returns plain-text password. */
+export async function resetAndSendWarehousePassword(
+  staffId: string,
+  newPassword: string
+): Promise<ActionResult<{ password: string; email: string; sentEmail: boolean }>> {
+  try {
+    await requireAdmin();
+    if (newPassword.length < 8) {
+      return { success: false, error: "Password must be at least 8 characters" };
+    }
+    const staff = await prisma.warehouseStaff.findUniqueOrThrow({
+      where: { id: staffId },
+      include: { user: { select: { email: true } } },
+    });
+    const hash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: staff.userId }, data: { password: hash } });
+
+    let sentEmail = false;
+    try {
+      await sendStaffCredentialsEmail({
+        staffEmail: staff.user.email,
+        staffName: staff.fullName,
+        password: newPassword,
+      });
+      sentEmail = true;
+    } catch {
+      // Don't block on email failure
+    }
+    return { success: true, data: { password: newPassword, email: staff.user.email, sentEmail } };
   } catch (e) {
     return { success: false, error: normalizeError(e) };
   }

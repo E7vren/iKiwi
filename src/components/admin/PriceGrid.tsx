@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Minus, Save, TrendingDown, TrendingUp } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -95,17 +96,24 @@ export function PriceGrid() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useForm<FormValues>({
-    values: {
+    defaultValues: { prices: [] },
+  });
+
+  // Reset the form whenever products data changes (initial load, after save).
+  // Using defaultValues + manual reset avoids RHF's caching of "dirty" inputs.
+  useEffect(() => {
+    reset({
       prices: products.map((p) => ({
         productId: p.id,
-        unitType: p.unitType,
-        priceKg: p.pricePerKg != null ? String(p.pricePerKg) : "",
-        pricePcs: p.pricePerPiece != null ? String(p.pricePerPiece) : "",
+        unitType:  p.unitType,
+        priceKg:   p.pricePerKg    != null ? String(p.pricePerKg)    : "",
+        pricePcs:  p.pricePerPiece != null ? String(p.pricePerPiece) : "",
       })),
-    },
-  });
+    });
+  }, [products, reset]);
 
   async function onSubmit(data: FormValues) {
     const payload = data.prices
@@ -133,7 +141,8 @@ export function PriceGrid() {
       return;
     }
     toast.success(`${payload.length} prices saved — shops notified!`);
-    qc.invalidateQueries({ queryKey: ["products-with-prices"] });
+    // Wait for refetch so the form resets with the just-saved values
+    await qc.refetchQueries({ queryKey: ["products-with-prices"] });
     qc.invalidateQueries({ queryKey: ["products"] });
   }
 
@@ -203,7 +212,7 @@ export function PriceGrid() {
                       <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs w-24">vs yesterday</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-border">
                     {items.map(({ product, idx }) => (
                       <tr key={product.id} className="hover:bg-muted/40/50">
                         <td className="px-4 py-2.5">

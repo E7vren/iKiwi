@@ -4,14 +4,18 @@ import { useCallback, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import {
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
   ChevronsUpDown,
+  Copy,
   Eye,
   EyeOff,
   KeyRound,
   Loader2,
+  Mail,
   Plus,
+  RefreshCw,
   UserCheck,
   UserX,
 } from "lucide-react";
@@ -52,6 +56,7 @@ import {
 } from "@/lib/validations/delivery-staff.schema";
 import {
   adminResetPassword,
+  adminResetAndSendPassword,
   adminToggleStaffActive,
   createDeliveryStaff,
   getAllStaffWithStats,
@@ -62,6 +67,7 @@ import {
   createWarehouseStaff,
   getAllWarehouseStaffAdmin,
   resetWarehouseStaffPassword,
+  resetAndSendWarehousePassword,
   toggleWarehouseStaffActive,
 } from "@/server/actions/restock";
 
@@ -139,11 +145,13 @@ function AddStaffDialog({
   open,
   onClose,
   onSuccess,
+  onShowCreds,
   prefill,
 }: {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onShowCreds: (creds: Creds) => void;
   prefill?: { fullName?: string; email?: string; phone?: string; vehicleType?: string; vehiclePlate?: string };
 }) {
   const [showPwd, setShowPwd] = useState(false);
@@ -183,7 +191,13 @@ function AddStaffDialog({
   async function onSubmit(data: CreateStaffInput) {
     const result = await createDeliveryStaff(data);
     if (!result.success) { toast.error(result.error); return; }
-    toast.success("Staff member added — credentials emailed");
+    toast.success("Staff member added");
+    onShowCreds({
+      fullName:  data.fullName,
+      email:     data.email,
+      password:  data.password,
+      sentEmail: true, // createDeliveryStaff already sends the email
+    });
     reset();
     onClose();
     onSuccess();
@@ -679,6 +693,99 @@ function generateWorkPassword(fullName: string): string {
   return slug.charAt(0).toUpperCase() + slug.slice(1) + "123!";
 }
 
+// ─── Credentials reveal modal ─────────────────────────────────────────────────
+
+interface Creds {
+  fullName: string;
+  email:    string;
+  password: string;
+  sentEmail: boolean;
+}
+
+function CredentialsModal({ creds, onClose }: { creds: Creds | null; onClose: () => void }) {
+  const [copied, setCopied] = useState<"email" | "password" | "all" | null>(null);
+
+  if (!creds) return null;
+
+  function copy(text: string, key: "email" | "password" | "all") {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1500);
+  }
+
+  const fullCreds = `Email: ${creds.email}\nPassword: ${creds.password}`;
+
+  return (
+    <Dialog open={!!creds} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            Credentials ready for {creds.fullName}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-1">
+          <p className="text-sm text-muted-foreground">
+            {creds.sentEmail
+              ? "An email with these credentials was sent. You can also copy and share them via WhatsApp, Telegram or SMS."
+              : "Email could not be sent — please share these credentials manually with the staff member."}
+          </p>
+
+          {/* Email row */}
+          <div className="rounded-xl border border-border bg-muted/40 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">Email</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 font-mono text-sm">{creds.email}</code>
+              <Button size="sm" variant="outline" className="h-8 px-2 shrink-0" onClick={() => copy(creds.email, "email")}>
+                {copied === "email" ? <CheckCircle2 className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+              </Button>
+            </div>
+          </div>
+
+          {/* Password row */}
+          <div className="rounded-xl border border-amber-500/40 bg-amber-50 dark:bg-amber-950/30 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-1.5">
+              Password (shown once)
+            </p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 font-mono text-sm font-bold">{creds.password}</code>
+              <Button size="sm" variant="outline" className="h-8 px-2 shrink-0" onClick={() => copy(creds.password, "password")}>
+                {copied === "password" ? <CheckCircle2 className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+              </Button>
+            </div>
+            <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-2 leading-snug">
+              ⚠️ This password won&apos;t be shown again. Save it somewhere safe or share now.
+            </p>
+          </div>
+
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => copy(fullCreds, "all")}
+          >
+            {copied === "all" ? (
+              <>
+                <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy both
+              </>
+            )}
+          </Button>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={onClose}>Done</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Warehouse staff types ────────────────────────────────────────────────────
 
 type WHStaff = Awaited<ReturnType<typeof getAllWarehouseStaffAdmin>>[number];
@@ -689,11 +796,13 @@ function AddWarehouseDialog({
   open,
   onClose,
   onSuccess,
+  onShowCreds,
   prefill,
 }: {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onShowCreds: (creds: Creds) => void;
   prefill?: { fullName?: string; email?: string; phone?: string };
 }) {
   const [showPw, setShowPw] = useState(false);
@@ -723,6 +832,12 @@ function AddWarehouseDialog({
     setBusy(false);
     if (!res.success) { toast.error(res.error); return; }
     toast.success("Warehouse staff added");
+    onShowCreds({
+      fullName:  form.fullName,
+      email:     form.email,
+      password:  form.password,
+      sentEmail: false, // createWarehouseStaff doesn't currently email — admin shares manually
+    });
     setForm({ fullName: "", email: "", phone: "", password: "" });
     onClose();
     onSuccess();
@@ -843,16 +958,19 @@ function WarehouseStaffTab({
   prefill,
   autoOpen,
   onConsumePrefill,
+  onShowCreds,
 }: {
   prefill?: { fullName?: string; email?: string; phone?: string };
   autoOpen?: boolean;
   onConsumePrefill?: () => void;
-} = {}) {
+  onShowCreds: (creds: Creds) => void;
+}) {
   const [whStaff, setWhStaff] = useState<WHStaff[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [resetTarget, setResetTarget] = useState<WHStaff | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [resettingId, setResettingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (autoOpen) {
@@ -860,6 +978,20 @@ function WarehouseStaffTab({
       onConsumePrefill?.();
     }
   }, [autoOpen, onConsumePrefill]);
+
+  async function handleResetAndSend(s: WHStaff) {
+    setResettingId(s.id);
+    const newPw = generateWorkPassword(s.fullName) || "Password123!";
+    const res = await resetAndSendWarehousePassword(s.id, newPw);
+    setResettingId(null);
+    if (!res.success) { toast.error(res.error); return; }
+    onShowCreds({
+      fullName:  s.fullName,
+      email:     res.data!.email,
+      password:  res.data!.password,
+      sentEmail: res.data!.sentEmail,
+    });
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -943,9 +1075,25 @@ function WarehouseStaffTab({
                         size="sm"
                         variant="outline"
                         className="h-7 text-xs px-2"
-                        onClick={() => setResetTarget(s)}
+                        onClick={() => handleResetAndSend(s)}
+                        disabled={resettingId === s.id}
+                        title="Reset password and send via email"
                       >
-                        <KeyRound className="h-3 w-3 mr-1" /> Password
+                        {resettingId === s.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        ) : (
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                        )}
+                        Reset & Send
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs px-2"
+                        onClick={() => setResetTarget(s)}
+                        title="Set a custom password"
+                      >
+                        <KeyRound className="h-3 w-3 mr-1" /> Custom
                       </Button>
                       <Button
                         size="icon"
@@ -972,7 +1120,7 @@ function WarehouseStaffTab({
         )}
       </div>
 
-      <AddWarehouseDialog open={addOpen} onClose={() => setAddOpen(false)} onSuccess={load} prefill={prefill} />
+      <AddWarehouseDialog open={addOpen} onClose={() => setAddOpen(false)} onSuccess={load} prefill={prefill} onShowCreds={onShowCreds} />
       <ResetWHPasswordDialog staff={resetTarget} onClose={() => setResetTarget(null)} />
     </div>
   );
@@ -1036,6 +1184,22 @@ function StaffPageInner() {
   const [resetTarget, setResetTarget] = useState<StaffRow | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [resettingDeliveryId, setResettingDeliveryId] = useState<string | null>(null);
+  const [creds, setCreds] = useState<Creds | null>(null);
+
+  async function handleDeliveryResetAndSend(s: StaffRow) {
+    setResettingDeliveryId(s.id);
+    const newPw = generateWorkPassword(s.fullName) || "Password123!";
+    const res = await adminResetAndSendPassword({ staffId: s.id, newPassword: newPw });
+    setResettingDeliveryId(null);
+    if (!res.success) { toast.error(res.error); return; }
+    setCreds({
+      fullName:  s.fullName,
+      email:     res.data!.email,
+      password:  res.data!.password,
+      sentEmail: res.data!.sentEmail,
+    });
+  }
 
   // Auto-open delivery dialog when arriving from a driver application
   useEffect(() => {
@@ -1124,6 +1288,7 @@ function StaffPageInner() {
             setAutoOpenWarehouse(false);
             setWarehousePrefill(null);
           }}
+          onShowCreds={setCreds}
         />
       )}
       {tab === "delivery" && (<>
@@ -1277,6 +1442,20 @@ function StaffPageInner() {
                           Edit
                         </Button>
                         <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs px-2"
+                          disabled={resettingDeliveryId === s.id}
+                          onClick={() => handleDeliveryResetAndSend(s)}
+                          title="Reset password and send via email"
+                        >
+                          {resettingDeliveryId === s.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Mail className="h-3 w-3" />
+                          )}
+                        </Button>
+                        <Button
                           size="icon"
                           variant="ghost"
                           className={`h-7 w-7 ${s.isActive ? "hover:text-red-600" : "hover:text-green-700"}`}
@@ -1306,6 +1485,7 @@ function StaffPageInner() {
         open={addOpen}
         onClose={() => { setAddOpen(false); setDeliveryPrefill(null); }}
         onSuccess={load}
+        onShowCreds={setCreds}
         prefill={deliveryPrefill ?? undefined}
       />
       <EditStaffDialog
@@ -1326,6 +1506,9 @@ function StaffPageInner() {
         onToggleActive={handleToggleActive}
       />
       </>)}
+
+      {/* Credentials reveal modal — shown after creating staff or resetting password */}
+      <CredentialsModal creds={creds} onClose={() => setCreds(null)} />
     </div>
   );
 }

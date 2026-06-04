@@ -462,7 +462,7 @@ export function LandingClient() {
               <span className="font-bold text-foreground">iKiWi</span>
               <span className="text-sm text-muted-foreground">© 2026</span>
             </div>
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-5 sm:gap-6 text-sm flex-wrap justify-center">
               <Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">
                 {T.careers}
               </Link>
@@ -474,6 +474,9 @@ export function LandingClient() {
               </Link>
               <Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">
                 {T.landLogin}
+              </Link>
+              <Link href="/login" className="inline-flex items-center gap-1.5 text-primary font-semibold hover:underline">
+                <span>👥</span> Staff sign in
               </Link>
             </div>
           </div>
