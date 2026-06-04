@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Minus, Save, TrendingDown, TrendingUp } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -102,17 +102,27 @@ export function PriceGrid() {
     defaultValues: { prices: [] },
   });
 
-  // Reset the form whenever products data changes (initial load, after save).
-  // Using defaultValues + manual reset avoids RHF's caching of "dirty" inputs.
-  useEffect(() => {
-    reset({
-      prices: products.map((p) => ({
+  // Build a reset payload from a list of products
+  function buildResetValues(list: ProductWithYesterday[]): FormValues {
+    return {
+      prices: list.map((p) => ({
         productId: p.id,
         unitType:  p.unitType,
         priceKg:   p.pricePerKg    != null ? String(p.pricePerKg)    : "",
         pricePcs:  p.pricePerPiece != null ? String(p.pricePerPiece) : "",
       })),
-    });
+    };
+  }
+
+  // Only seed the form ONCE on first load. After that, we manually reset
+  // inside onSubmit so that React Query background refetches never wipe
+  // the user's in-progress edits.
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (seededRef.current) return;
+    if (products.length === 0) return;
+    reset(buildResetValues(products));
+    seededRef.current = true;
   }, [products, reset]);
 
   async function onSubmit(data: FormValues) {
@@ -141,8 +151,15 @@ export function PriceGrid() {
       return;
     }
     toast.success(`${payload.length} prices saved — shops notified!`);
-    // Wait for refetch so the form resets with the just-saved values
-    await qc.refetchQueries({ queryKey: ["products-with-prices"] });
+
+    // Refetch and explicitly reset the form with the just-saved data.
+    // We don't rely on a useEffect — the cache update timing is too racy.
+    const fresh = await qc.fetchQuery({
+      queryKey:  ["products-with-prices"],
+      queryFn:   fetchProductsWithPrices,
+      staleTime: 0,
+    });
+    reset(buildResetValues(fresh));
     qc.invalidateQueries({ queryKey: ["products"] });
   }
 
